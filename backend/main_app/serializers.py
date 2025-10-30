@@ -12,7 +12,7 @@ class PollutionTypeSerializer(serializers.ModelSerializer):
 class MarkerPhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = MarkerPhoto
-        fields = ("id", "image_path", "uploaded_at")
+        fields = ("id", "image", "uploaded_at")
         read_only_fields = ("id", "uploaded_at")
 
 

@@ -60,7 +60,7 @@ class MarkerPhoto(models.Model):
         related_name="photos",
         verbose_name="Метка",
     )
-    image_path = models.CharField("Путь к изображению", max_length=255)
+    image = models.ImageField("Изображение", upload_to='marker_photos/', default='')
     uploaded_at = models.DateTimeField("Загружено", auto_now_add=True)
 
     class Meta:
