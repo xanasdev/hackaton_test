@@ -34,7 +34,15 @@ class MarkerViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        """Автоматически добавляем создателя маркера."""
+        """Автоматически добавляем создателя маркера и обрабатываем фотографии."""
+        files = self.request.FILES.getlist('photos')
+        photos_data = []
+        
+        if files:
+            for photo in files:
+                photos_data.append({'image': photo})
+                
+        serializer.context['photos'] = photos_data
         serializer.save(
             creator=self.request.user,
             creator_username=self.request.user.username

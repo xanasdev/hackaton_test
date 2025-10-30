@@ -25,7 +25,7 @@ class MarkerAdmin(admin.ModelAdmin):
 
 @admin.register(MarkerPhoto)
 class MarkerPhotoAdmin(admin.ModelAdmin):
-    list_display = ("marker", "image_path", "uploaded_at")
-    search_fields = ("image_path", "marker__region_type")
+    list_display = ("marker", "image", "uploaded_at")
+    search_fields = ("image", "marker__region_type")
     list_filter = ("uploaded_at",)
     raw_id_fields = ("marker",)
