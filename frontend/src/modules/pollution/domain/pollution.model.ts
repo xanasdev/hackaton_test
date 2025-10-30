@@ -62,6 +62,11 @@ export interface MarkerFilters {
 	type?: PollutionType | string
 }
 
+export interface MarkerPhotoInput {
+	image_path?: string
+	image_file?: File
+}
+
 export interface CreateMarkerPayload {
 	latitude: string
 	longitude: string
@@ -71,7 +76,7 @@ export interface CreateMarkerPayload {
 		name: PollutionType | string
 		description?: string
 	}
-	photos?: Array<{image_path: string}>
+	photos?: MarkerPhotoInput[]
 }
 
 export interface UpdateMarkerPayload {

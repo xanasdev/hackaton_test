@@ -1,4 +1,4 @@
-import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/shared/components/ui/Sheet'
+import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle} from '@/shared/components/ui/Sheet'
 import {Marker, PollutionStatus} from '../../domain/pollution.model'
 import {UserRole} from '@/modules/auth'
 import {PointDetails} from './PointDetails'
@@ -16,6 +16,7 @@ export const PointDetailsDrawer = ({marker, userRole, onClose, onStatusChange, o
 		<SheetContent>
 			<SheetHeader>
 				<SheetTitle>Pollution Details</SheetTitle>
+				<SheetDescription>Информация о выбранной точке загрязнения</SheetDescription>
 			</SheetHeader>
 			{marker && (
 				<PointDetails marker={marker} userRole={userRole} onStatusChange={onStatusChange} onDelete={onDelete} />
