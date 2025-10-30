@@ -1,9 +1,7 @@
 'use client'
 
-import {AuthCard} from '@/shared/components/auth/AuthCard'
-import {AuthFooter} from '@/shared/components/auth/AuthFooter'
-import {RegisterForm} from '@/shared/components/auth/RegisterForm'
-import {useAuth} from '@/shared/hooks/use-auth'
+import {useAuth} from '@/modules/auth'
+import {AuthCard, AuthFooter, RegisterForm} from '@/modules/auth/ui'
 import {RegisterFormData} from '@/shared/schemas/auth.schema'
 
 export default function RegisterPage() {

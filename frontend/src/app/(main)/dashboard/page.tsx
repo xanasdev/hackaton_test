@@ -1,8 +1,6 @@
 'use client'
 
-import {pollutionService} from '@/shared/api/pollution.service'
 import {DashboardStats} from '@/shared/components/dashboard/DashboardStats'
-import {PollutionCard} from '@/shared/components/dashboard/PollutionCard'
 import {DashboardHeader} from '@/shared/components/layout/DashboardHeader'
 import {Button} from '@/shared/components/ui/Button'
 import {Card} from '@/shared/components/ui/Card'
@@ -12,10 +10,10 @@ import {
 	TabsList,
 	TabsTrigger,
 } from '@/shared/components/ui/Tabs'
-import {useAuth} from '@/shared/hooks/use-auth'
-import {usePollution} from '@/shared/hooks/use-pollution'
+import {useAuth} from '@/modules/auth'
+import {PollutionCard} from '@/modules/pollution/ui/PollutionCard'
+import {usePollution, pollutionApi, PollutionStatus} from '@/modules/pollution'
 import styles from '@/shared/styles/dashboard-page.module.css'
-import {PollutionStatus} from '@/shared/types'
 import {Download} from 'lucide-react'
 import {useState} from 'react'
 import {toast} from 'sonner'
@@ -25,9 +23,8 @@ export default function DashboardPage() {
 	const [activeTab, setActiveTab] = useState<PollutionStatus>(
 		PollutionStatus.REPORTED,
 	)
-	const {points, stats} = usePollution({status: activeTab})
+	const {markers, stats} = usePollution({status: activeTab})
 
-	// Check if user has activist or admin role by role_name
 	const canManage =
 		user?.role_name === 'ACTIVIST' || user?.role_name === 'ADMIN'
 
@@ -50,7 +47,7 @@ export default function DashboardPage() {
 
 	const handleExport = async () => {
 		try {
-			const blob = await pollutionService.exportReport()
+			const blob = await pollutionApi.exportReport()
 			const url = window.URL.createObjectURL(blob)
 			const a = document.createElement('a')
 			a.href = url
@@ -90,16 +87,16 @@ export default function DashboardPage() {
 					</TabsList>
 
 					<TabsContent value={activeTab} className={styles.tabContent}>
-						{points.length === 0 ? (
+						{markers.length === 0 ? (
 							<Card className={styles.emptyState}>
 								<p className={styles.emptyText}>Точки не найдены</p>
 							</Card>
 						) : (
 							<div className={styles.pointsGrid}>
-								{points.map((point) => (
+								{markers.map((marker) => (
 									<PollutionCard
-										key={point.id}
-										point={point}
+										key={marker.id}
+										marker={marker}
 									/>
 								))}
 							</div>

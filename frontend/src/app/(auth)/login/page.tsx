@@ -1,10 +1,8 @@
 'use client'
 
-import {useAuth} from '@/shared/hooks/use-auth'
+import {useAuth} from '@/modules/auth'
+import {AuthCard, AuthFooter, LoginForm} from '@/modules/auth/ui'
 import {LoginFormData} from '@/shared/schemas/auth.schema'
-import {AuthCard} from '@/shared/components/auth/AuthCard'
-import {LoginForm} from '@/shared/components/auth/LoginForm'
-import {AuthFooter} from '@/shared/components/auth/AuthFooter'
 
 export default function LoginPage() {
 	const {login, isLoginLoading} = useAuth()

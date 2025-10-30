@@ -1,23 +1,26 @@
 'use client'
 
-import {ReportPollutionDialog} from '@/shared/components/dialogs/ReportPollutionDialog'
-import {DashboardLayout} from '@/shared/components/layout/DashboardLayout'
-import {DashboardHeader} from '@/shared/components/layout/DashboardHeader'
-import {DashboardSidebar} from '@/shared/components/layout/DashboardSidebar'
-import {MapMarkersList} from '@/shared/components/map/MapMarkersList'
-import {MapWrapper} from '@/shared/components/map/MapWrapper'
-import {YandexMapView} from '@/shared/components/map/YandexMapView'
-import {NearbyDangerList} from '@/shared/components/nearby/NearbyDangerList'
-import {FilterDrawer} from '@/shared/components/sheets/FilterDrawer'
-import {PointDetailsDrawer} from '@/shared/components/sheets/PointDetailsDrawer'
-import {useAuth} from '@/shared/hooks/use-auth'
-import {useGeolocation} from '@/shared/hooks/use-geolocation'
-import {usePollution} from '@/shared/hooks/use-pollution'
-import {findNearbyPoints} from '@/shared/utils/distance.utils'
-import {UserRole} from '@/shared/types'
 import {useMemo, useState} from 'react'
-import {useMapActions} from './hooks/useMapActions'
-import {useMapState} from './hooks/useMapState'
+import {useAuth, UserRole} from '@/modules/auth'
+import {PollutionStatus} from '@/modules/pollution/domain/pollution.model'
+import {ReportPollutionDialog} from '@/modules/pollution/ui/dialogs/ReportPollutionDialog'
+import {FilterDrawer} from '@/modules/pollution/ui/filter/FilterDrawer'
+import {PointDetailsDrawer} from '@/modules/pollution/ui/details/PointDetailsDrawer'
+import {MapMarkersList} from '@/modules/pollution/ui/map/MapMarkersList'
+import {MapWrapper} from '@/modules/pollution/ui/map/MapWrapper'
+import {YandexMapView} from '@/modules/pollution/ui/map/YandexMapView'
+import {NearbyDangerList} from '@/modules/pollution/ui/nearby/NearbyDangerList'
+import {findNearbyMarkers} from '@/modules/pollution/utils/distance'
+import {usePollution} from '@/modules/pollution/hooks/usePollution'
+import {usePollutionActions} from '@/modules/pollution/hooks/usePollutionActions'
+import {usePollutionState} from '@/modules/pollution/hooks/usePollutionState'
+import {DashboardHeader} from '@/modules/layout/DashboardHeader'
+import {DashboardLayout} from '@/modules/layout/DashboardLayout'
+import {DashboardSidebar} from '@/modules/layout/DashboardSidebar'
+import {ReportPollutionFormData} from '@/modules/pollution/schemas/report.schema'
+import {useGeolocation} from '@/shared/hooks/use-geolocation'
+import {extractCoordinates} from '@/shared/utils/map.utils'
+import {YandexMapEvent} from '@/shared/interfaces/map.interface'
 
 export default function HomePage() {
 	const {user} = useAuth()
@@ -25,39 +28,70 @@ export default function HomePage() {
 	const location = useGeolocation()
 
 	const {
-		selectedPoint,
-		setSelectedPoint,
+		selectedMarker,
+		setSelectedMarker,
 		reportDialogOpen,
 		setReportDialogOpen,
-		filterOpen,
-		setFilterOpen,
-		newPointCoords,
-		setNewPointCoords,
+		filtersSheetOpen,
+		setFiltersSheetOpen,
+		draftCoordinates,
+		setDraftCoordinates,
 		filters,
 		setFilters,
-	} = useMapState()
+	} = usePollutionState()
 
-	const {points, stats, createPoint, updatePoint, deletePoint, isCreating} =
-		usePollution(filters)
+	const {markers, stats, createMarker, deleteMarker, isCreating} = usePollution(filters)
 
-	const {handleMapClick, handleReportSubmit, handleStatusChange, handleDelete} =
-		useMapActions({
-			setNewPointCoords,
-			setReportDialogOpen,
-			setSelectedPoint,
-			createPoint,
-			updatePoint,
-			deletePoint,
-			selectedPoint,
-		})
+	const {submitReport, deleteReport, changeStatus} = usePollutionActions({
+		createMarker,
+		deleteMarker,
+	})
 
-	const nearbyPoints = useMemo(() => {
+	const nearbyMarkers = useMemo(() => {
 		if (!location.latitude || !location.longitude) return []
-		return findNearbyPoints(location.latitude, location.longitude, points, 50)
-	}, [location.latitude, location.longitude, points])
+		return findNearbyMarkers(location.latitude, location.longitude, markers, 50)
+	}, [location.latitude, location.longitude, markers])
 
 	const showNearby =
-		nearbyPoints.length > 0 && !nearbyDismissed && !!location.latitude
+		nearbyMarkers.length > 0 && !nearbyDismissed && !!location.latitude
+
+	const handleMapClick = (event: YandexMapEvent) => {
+		const coordinates = extractCoordinates(event)
+		setDraftCoordinates(coordinates)
+		setReportDialogOpen(true)
+	}
+
+	const handleReportSubmit = (data: ReportPollutionFormData & {photos: File[]}) => {
+		submitReport(draftCoordinates, data, {
+			onSuccess: () => {
+				setReportDialogOpen(false)
+				setDraftCoordinates(null)
+			},
+		})
+	}
+
+	const handleReportDialogChange = (open: boolean) => {
+		setReportDialogOpen(open)
+		if (!open) {
+			setDraftCoordinates(null)
+		}
+	}
+
+	const handleDeleteMarker = () => {
+		deleteReport(selectedMarker, {
+			onSuccess: () => setSelectedMarker(null),
+		})
+	}
+
+	const handleStatusChange = (status: PollutionStatus) => {
+		changeStatus(status)
+	}
+
+	const handleDetailsClose = () => setSelectedMarker(null)
+
+	const handleFilterDrawerChange = (open: boolean) => {
+		setFiltersSheetOpen(open)
+	}
 
 	return (
 		<>
@@ -66,26 +100,26 @@ export default function HomePage() {
 				sidebar={
 					<DashboardSidebar
 						stats={stats}
-						points={points}
-						onPointClick={setSelectedPoint}
-						onFilterClick={() => setFilterOpen(true)}
+						markers={markers}
+						onMarkerClick={setSelectedMarker}
+						onFilterClick={() => setFiltersSheetOpen(true)}
 						onReportClick={() => setReportDialogOpen(true)}
 					/>
 				}
 				map={
 					<MapWrapper>
 						<YandexMapView onMapClick={handleMapClick}>
-							<MapMarkersList points={points} onMarkerClick={setSelectedPoint} />
+							<MapMarkersList markers={markers} onMarkerClick={setSelectedMarker} />
 						</YandexMapView>
 
 						{showNearby && location.latitude && location.longitude && (
 							<NearbyDangerList
-								nearbyPoints={nearbyPoints}
+								markers={nearbyMarkers}
 								userLocation={{
 									latitude: location.latitude,
 									longitude: location.longitude,
 								}}
-								onPointClick={setSelectedPoint}
+								onMarkerClick={setSelectedMarker}
 								onClose={() => setNearbyDismissed(true)}
 							/>
 						)}
@@ -95,27 +129,27 @@ export default function HomePage() {
 
 			<ReportPollutionDialog
 				open={reportDialogOpen}
-				onOpenChange={setReportDialogOpen}
-				coords={newPointCoords}
-				onSubmit={(data) => handleReportSubmit(newPointCoords, data)}
+				onOpenChange={handleReportDialogChange}
+				coords={draftCoordinates}
+				onSubmit={handleReportSubmit}
 				isLoading={isCreating}
 			/>
 
 			<PointDetailsDrawer
-				point={selectedPoint}
+				marker={selectedMarker}
 				userRole={user?.role_name as UserRole | undefined}
-				onClose={() => setSelectedPoint(null)}
+				onClose={handleDetailsClose}
 				onStatusChange={handleStatusChange}
-				onDelete={handleDelete}
+				onDelete={handleDeleteMarker}
 			/>
 
 			<FilterDrawer
-				open={filterOpen}
-				onOpenChange={setFilterOpen}
+				open={filtersSheetOpen}
+				onOpenChange={handleFilterDrawerChange}
 				status={filters.status}
 				type={filters.type}
-				onStatusChange={(status) => setFilters((f) => ({...f, status}))}
-				onTypeChange={(type) => setFilters((f) => ({...f, type}))}
+				onStatusChange={(status) => setFilters((prev) => ({...prev, status}))}
+				onTypeChange={(type) => setFilters((prev) => ({...prev, type}))}
 				onReset={() => setFilters({})}
 			/>
 		</>
