@@ -1,84 +1,80 @@
-import { PollutionPoint, PollutionStatus, PollutionType } from '@/shared/types'
-import { ReportFormData } from './components.interface'
+import {PollutionPoint, PollutionStatus, PollutionType} from '@/shared/types'
+import {ReportFormData} from './components.interface'
 
-// Geolocation
 export interface GeolocationState {
-  latitude: number | null
-  longitude: number | null
-  error: string | null
-  loading: boolean
+	latitude: number | null
+	longitude: number | null
+	error: string | null
+	loading: boolean
 }
 
-// Map State
 export interface MapState {
-  selectedPoint: PollutionPoint | null
-  reportDialogOpen: boolean
-  filterOpen: boolean
-  newPointCoords: [number, number] | null
-  filters: MapFilters
+	selectedPoint: PollutionPoint | null
+	reportDialogOpen: boolean
+	filterOpen: boolean
+	newPointCoords: [number, number] | null
+	filters: MapFilters
 }
 
 export interface MapFilters {
-  status?: PollutionStatus
-  type?: PollutionType
+	status?: PollutionStatus
+	type?: PollutionType
 }
 
-// Map Actions
 export interface UseMapActionsProps {
-  setNewPointCoords: (coords: [number, number] | null) => void
-  setReportDialogOpen: (open: boolean) => void
-  setSelectedPoint: (point: PollutionPoint | null) => void
-  createPoint: CreatePointMutation
-  updatePoint: UpdatePointMutation
-  deletePoint: DeletePointMutation
-  selectedPoint: PollutionPoint | null
+	setNewPointCoords: (coords: [number, number] | null) => void
+	setReportDialogOpen: (open: boolean) => void
+	setSelectedPoint: (point: PollutionPoint | null) => void
+	createPoint: CreatePointMutation
+	updatePoint: UpdatePointMutation
+	deletePoint: DeletePointMutation
+	selectedPoint: PollutionPoint | null
 }
 
 export interface MapHandlers {
-  handleMapClick: (e: YandexMapEvent) => void
-  handleReportSubmit: (
-    coords: [number, number] | null,
-    data: ReportFormData
-  ) => void
-  handleStatusChange: (status: PollutionStatus) => void
-  handleDelete: () => void
+	handleMapClick: (e: YandexMapEvent) => void
+	handleReportSubmit: (
+		coords: [number, number] | null,
+		data: ReportFormData,
+	) => void
+	handleStatusChange: (status: PollutionStatus) => void
+	handleDelete: () => void
 }
 
 export interface YandexMapEvent {
-  get: (key: string) => unknown
+	get: (key: string) => unknown
 }
 
-// Mutation types (placeholder - adjust based on your actual mutation library)
 export type CreatePointMutation = (
-  data: CreatePointData,
-  options?: MutationOptions
+	data: CreatePointData,
+	options?: MutationOptions,
 ) => void
 
 export type UpdatePointMutation = (
-  data: UpdatePointData,
-  options?: MutationOptions
+	data: UpdatePointData,
+	options?: MutationOptions,
 ) => void
 
 export type DeletePointMutation = (
-  id: string,
-  options?: MutationOptions
+	id: string,
+	options?: MutationOptions,
 ) => void
 
 export interface CreatePointData {
-  latitude: number
-  longitude: number
-  type: PollutionType
-  description: string
-  photos: File[]
-  region?: string
+	latitude: number
+	longitude: number
+	type: PollutionType
+	description: string
+	photos: File[]
+	region?: string
 }
 
 export interface UpdatePointData {
-  id: string
-  data: Partial<PollutionPoint>
+	id: string
+	data: Partial<PollutionPoint>
 }
 
 export interface MutationOptions {
-  onSuccess?: () => void
-  onError?: () => void
+	onSuccess?: () => void
+	onError?: () => void
 }
