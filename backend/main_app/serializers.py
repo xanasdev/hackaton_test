@@ -1,145 +1,85 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models import PollutionComment, PollutionReport, PollutionStatusLog, PollutionType
-
-
-User = get_user_model()
+from .models import Marker, MarkerPhoto, PollutionType
 
 
 class PollutionTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = PollutionType
-        fields = (
-            "id",
-            "slug",
-            "name",
-            "description",
-            "is_active",
-        )
+        fields = ("id", "name", "description")
 
 
-class PollutionCommentSerializer(serializers.ModelSerializer):
-    author = serializers.StringRelatedField(read_only=True)
+class MarkerPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MarkerPhoto
+        fields = ("id", "image_path", "uploaded_at")
+        read_only_fields = ("id", "uploaded_at")
+
+
+class MarkerSerializer(serializers.ModelSerializer):
+    pollution_type = PollutionTypeSerializer()
+    photos = MarkerPhotoSerializer(many=True, required=False)
 
     class Meta:
-        model = PollutionComment
+        model = Marker
         fields = (
             "id",
-            "author",
-            "text",
-            "created_at",
-        )
-        read_only_fields = ("id", "author", "created_at")
-
-
-class PollutionCommentCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PollutionComment
-        fields = ("text",)
-
-
-class PollutionStatusLogSerializer(serializers.ModelSerializer):
-    changed_by = serializers.StringRelatedField()
-
-    class Meta:
-        model = PollutionStatusLog
-        fields = (
-            "id",
-            "previous_status",
-            "new_status",
-            "changed_by",
-            "comment",
-            "changed_at",
-        )
-        read_only_fields = fields
-
-
-class PollutionReportListSerializer(serializers.ModelSerializer):
-    pollution_type = PollutionTypeSerializer(read_only=True)
-    reporter = serializers.StringRelatedField()
-    assigned_to = serializers.StringRelatedField()
-
-    class Meta:
-        model = PollutionReport
-        fields = (
-            "id",
-            "title",
-            "pollution_type",
-            "status",
             "latitude",
             "longitude",
-            "region",
-            "created_at",
-            "reporter",
-            "assigned_to",
-        )
-
-
-class PollutionReportDetailSerializer(serializers.ModelSerializer):
-    pollution_type = PollutionTypeSerializer(read_only=True)
-    reporter = serializers.StringRelatedField()
-    assigned_to = serializers.StringRelatedField()
-    status_logs = PollutionStatusLogSerializer(many=True, read_only=True)
-    comments = PollutionCommentSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = PollutionReport
-        fields = (
-            "id",
-            "title",
             "description",
+            "region_type",
             "pollution_type",
-            "status",
-            "latitude",
-            "longitude",
-            "region",
-            "address",
-            "photo",
-            "assigned_to",
-            "reporter",
+            "photos",
             "created_at",
-            "updated_at",
-            "status_logs",
-            "comments",
         )
-        read_only_fields = (
-            "id",
-            "reporter",
-            "created_at",
-            "updated_at",
-            "status_logs",
-            "comments",
-        )
-
-
-class PollutionReportCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PollutionReport
-        fields = (
-            "title",
-            "description",
-            "pollution_type",
-            "latitude",
-            "longitude",
-            "region",
-            "address",
-            "photo",
-        )
+        read_only_fields = ("id", "created_at")
 
     def create(self, validated_data):
-        request = self.context.get("request")
-        return PollutionReport.objects.create(
-            reporter=request.user,
-            **validated_data,
+        pollution_type_data = validated_data.pop("pollution_type")
+        photos_data = validated_data.pop("photos", [])
+
+        pollution_type, created = PollutionType.objects.get_or_create(
+            name=pollution_type_data["name"],
+            defaults={"description": pollution_type_data.get("description", "")},
         )
+        if not created and "description" in pollution_type_data:
+            # Обновим описание, если пришло новое значение
+            description = pollution_type_data.get("description")
+            if description and description != pollution_type.description:
+                pollution_type.description = description
+                pollution_type.save(update_fields=["description"])
 
+        marker = Marker.objects.create(pollution_type=pollution_type, **validated_data)
 
-class PollutionReportStatusUpdateSerializer(serializers.Serializer):
-    status = serializers.ChoiceField(choices=PollutionReport.STATUS_CHOICES)
-    comment = serializers.CharField(allow_blank=True, required=False)
-    assigned_to = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        required=False,
-        allow_null=True,
-    )
+        for photo_data in photos_data:
+            MarkerPhoto.objects.create(marker=marker, **photo_data)
+
+        return marker
+
+    def update(self, instance, validated_data):
+        pollution_type_data = validated_data.pop("pollution_type", None)
+        photos_data = validated_data.pop("photos", None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if pollution_type_data:
+            pollution_type, created = PollutionType.objects.get_or_create(
+                name=pollution_type_data["name"],
+                defaults={"description": pollution_type_data.get("description", "")},
+            )
+            if not created and "description" in pollution_type_data:
+                description = pollution_type_data.get("description")
+                if description and description != pollution_type.description:
+                    pollution_type.description = description
+                    pollution_type.save(update_fields=["description"])
+            instance.pollution_type = pollution_type
+
+        instance.save()
+
+        if photos_data is not None:
+            instance.photos.all().delete()
+            for photo_data in photos_data:
+                MarkerPhoto.objects.create(marker=instance, **photo_data)
+
+        return instance

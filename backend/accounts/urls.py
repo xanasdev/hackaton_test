@@ -15,4 +15,5 @@ urlpatterns = [
     
     path('admin-only/', views.admin_only_endpoint, name='admin-only'),
     path('manager/', views.manager_endpoint, name='manager'),
+    path('assign-role/', views.assign_role, name='assign-role'),
 ]
