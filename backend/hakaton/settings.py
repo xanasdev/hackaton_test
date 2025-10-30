@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'main_app',
     'accounts',
     'rest_framework',
@@ -62,7 +63,14 @@ SIMPLE_JWT = {
 
 ALLOWED_HOSTS = ['*']  # для разработки
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://0.0.0.0:3000',
+    'http://192.168.146.235:3000'
+]
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -97,12 +105,8 @@ WSGI_APPLICATION = 'hakaton.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'hackaton_db',  # замените на имя вашей базы данных
-        'USER': 'postgres',  # заменине увте на имя пользователя вашей базы данных
-        'PASSWORD': 'dagos527563',  # замените на пароль пользователя
-        'HOST': 'localhost',  # или IP-адрес вашего сервера базы данных
-        'PORT': '5432',  # стандартный порт для PostgreSQL
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
