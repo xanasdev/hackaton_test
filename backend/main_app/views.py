@@ -71,6 +71,13 @@ class PollutionReportViewSet(
     ).prefetch_related("status_logs", "comments")
     permission_classes = [IsAuthenticated]
 
+    def get_permissions(self):
+        if self.action in {"list", "retrieve"}:
+            return [AllowAny()]
+        if self.action == "comments" and self.request.method.lower() == "get":
+            return [AllowAny()]
+        return [permission() for permission in self.permission_classes]
+
     def get_serializer_class(self):
         if self.action == "create":
             return PollutionReportCreateSerializer
@@ -101,6 +108,8 @@ class PollutionReportViewSet(
         return qs
 
     def perform_create(self, serializer):
+        if not _has_permission(self.request.user, "report:create"):
+            self.permission_denied(self.request, message=_("Недостаточно прав для создания отчёта"))
         serializer.save()
 
     @action(detail=True, methods=["post"], url_path="status")
@@ -142,6 +151,9 @@ class PollutionReportViewSet(
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        if not _has_permission(request.user, "report:comment"):
+            self.permission_denied(request, message=_("Недостаточно прав для добавления комментария"))
 
         comment = PollutionComment.objects.create(
             report=report,
