@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Caspian Sea Clean Map
+
+Interactive pollution tracking platform for the Caspian Sea coastal region.
+
+## Features
+
+- **Interactive Map**: Yandex Maps integration for marking pollution points
+- **User Roles**: Support for citizens, activists, and administrators
+- **Real-time Updates**: Live pollution point tracking and status updates
+- **Photo Upload**: Document pollution with images
+- **Filtering**: Filter by status, type, and region
+- **Statistics**: Dashboard with pollution analytics
+- **Export Reports**: CSV export for data analysis
+
+## Tech Stack
+
+- **Framework**: Next.js 16 with App Router
+- **UI**: shadcn/ui components with Tailwind CSS
+- **State Management**: TanStack Query (React Query)
+- **Maps**: Yandex Maps API
+- **Forms**: React Hook Form with Zod validation
+- **HTTP Client**: Axios with interceptors
+- **Cookies**: js-cookie
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+
+### Installation
+
+```bash
+npm install
+```
+
+### Environment Setup
+
+Create a `.env.local` file:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+NEXT_PUBLIC_YANDEX_MAPS_KEY=your_yandex_maps_api_key
+```
+
+### Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── (auth)/          # Authentication pages
+│   ├── (main)/          # Main application pages
+│   └── providers.tsx    # React Query provider
+├── shared/
+│   ├── api/            # API service layer
+│   ├── components/     # Reusable components
+│   │   ├── ui/        # shadcn components
+│   │   ├── map/       # Map components
+│   │   ├── pollution/ # Pollution-specific components
+│   │   └── layout/    # Layout components
+│   ├── hooks/         # Custom React hooks
+│   ├── lib/           # Utilities and axios instance
+│   └── types/         # TypeScript types
+```
 
-## Learn More
+## User Roles
 
-To learn more about Next.js, take a look at the following resources:
+### Citizens
+- Report pollution points
+- View pollution map
+- Add photos and descriptions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Activists
+- All citizen features
+- Update pollution status
+- Access dashboard
+- Export reports
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Administrators
+- All activist features
+- Delete pollution points
+- Manage users
 
-## Deploy on Vercel
+## API Integration
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The app uses axios interceptors for:
+- Automatic token injection
+- 401 error handling
+- Request/response logging
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Services are organized by domain:
+- `auth.service.ts`: Authentication
+- `pollution.service.ts`: Pollution points CRUD
+
+## Components
+
+All components follow these principles:
+- Maximum 100 lines per file
+- Modular styling with Tailwind
+- Clean, decomposed code
+- No comments in production code
+- shadcn/ui components where possible
