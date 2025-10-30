@@ -32,15 +32,17 @@ interface RegisterResponse {
 export const authService = {
 	async login(credentials: LoginCredentials): Promise<LoginResponse> {
 		const {data} = await api.post<LoginResponse>('/auth/login/', credentials)
-		Cookies.set('access_token', data.access, {expires: 1}) // 1 day
-		Cookies.set('refresh_token', data.refresh, {expires: 7}) // 7 days
+		Cookies.set('access_token', data.access, {expires: 1, path: '/'})
+		Cookies.set('auth_token', data.access, {expires: 1, path: '/'})
+		Cookies.set('refresh_token', data.refresh, {expires: 7, path: '/'})
 		return data
 	},
 
 	async register(userData: RegisterData): Promise<RegisterResponse> {
 		const {data} = await api.post<RegisterResponse>('/auth/register/', userData)
-		Cookies.set('access_token', data.access, {expires: 1})
-		Cookies.set('refresh_token', data.refresh, {expires: 7})
+		Cookies.set('access_token', data.access, {expires: 1, path: '/'})
+		Cookies.set('auth_token', data.access, {expires: 1, path: '/'})
+		Cookies.set('refresh_token', data.refresh, {expires: 7, path: '/'})
 		return data
 	},
 
@@ -59,13 +61,15 @@ export const authService = {
 		const {data} = await api.post<AuthTokens>('/auth/token/refresh/', {
 			refresh,
 		})
-		Cookies.set('access_token', data.access, {expires: 1})
+		Cookies.set('access_token', data.access, {expires: 1, path: '/'})
+		Cookies.set('auth_token', data.access, {expires: 1, path: '/'})
 		return data
 	},
 
 	async logout(): Promise<void> {
-		Cookies.remove('access_token')
-		Cookies.remove('refresh_token')
+		Cookies.remove('access_token', {path: '/'})
+		Cookies.remove('auth_token', {path: '/'})
+		Cookies.remove('refresh_token', {path: '/'})
 		return Promise.resolve()
 	},
 }
