@@ -48,3 +48,11 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = '__all__'
+
+
+class AssignRoleSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
+    role_id = serializers.IntegerField()
+
+    class Meta:
+        fields = ('user_id', 'role_id')
