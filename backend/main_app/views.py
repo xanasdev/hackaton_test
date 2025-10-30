@@ -1,5 +1,5 @@
 from rest_framework import filters, viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .models import Marker, PollutionType
 from .serializers import MarkerSerializer, PollutionTypeSerializer
@@ -10,15 +10,15 @@ class PollutionTypeViewSet(viewsets.ModelViewSet):
 
     queryset = PollutionType.objects.all().order_by("name")
     serializer_class = PollutionTypeSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class MarkerViewSet(viewsets.ModelViewSet):
     """Управление метками загрязнений."""
 
-    queryset = Marker.objects.select_related("pollution_type").prefetch_related("photos")
+    queryset = Marker.objects.select_related("pollution_type", "creator").prefetch_related("photos")
     serializer_class = MarkerSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [filters.SearchFilter]
     search_fields = ["region_type", "description", "pollution_type__name"]
 
@@ -32,3 +32,10 @@ class MarkerViewSet(viewsets.ModelViewSet):
         if region_type:
             queryset = queryset.filter(region_type__iexact=region_type)
         return queryset
+
+    def perform_create(self, serializer):
+        """Автоматически добавляем создателя маркера."""
+        serializer.save(
+            creator=self.request.user,
+            creator_username=self.request.user.username
+        )

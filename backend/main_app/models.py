@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class PollutionType(models.Model):
@@ -30,6 +33,14 @@ class Marker(models.Model):
         verbose_name="Тип загрязнения",
     )
     created_at = models.DateTimeField("Создано", auto_now_add=True)
+    creator = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="markers",
+        verbose_name="Создатель"
+    )
+    creator_username = models.CharField("Имя создателя", max_length=150, blank=True)
 
     class Meta:
         ordering = ("-created_at",)
