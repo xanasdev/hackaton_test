@@ -26,13 +26,16 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # ✅ ИЗМЕНЕНО для разработки
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'main_app',
+    'accounts',  # ✅ НОВОЕ ПРИЛОЖЕНИЕ для аутентификации
+    'rest_framework',  # ✅ ДОБАВЛЕНО
+    'rest_framework_simplejwt',  # ✅ ДОБАВЛЕНО
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -127,3 +130,24 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ✅ ДОБАВЛЕНО: JWT и DRF настройки
+from datetime import timedelta
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+}
+
+# ✅ ДОБАВЛЕНО: Кастомная модель пользователя
+AUTH_USER_MODEL = 'accounts.User'
