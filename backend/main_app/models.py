@@ -22,7 +22,7 @@ class Marker(models.Model):
     latitude = models.CharField("Широта", max_length=64)
     longitude = models.CharField("Долгота", max_length=64)
     description = models.TextField("Описание", blank=True)
-    region_type = models.CharField("Тип региона", max_length=100)
+    region_type = models.CharField("Тип региона", max_length=100, blank=True, null=True)
     pollution_type = models.ForeignKey(
         PollutionType,
         on_delete=models.PROTECT,
