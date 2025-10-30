@@ -17,8 +17,9 @@ class MarkerPhotoSerializer(serializers.ModelSerializer):
 
 
 class MarkerSerializer(serializers.ModelSerializer):
-    pollution_type = PollutionTypeSerializer()
-    photos = MarkerPhotoSerializer(many=True, required=False)
+    pollution_type = PollutionTypeSerializer(read_only=True)
+    pollution_type_name = serializers.CharField(write_only=True)
+    photos = MarkerPhotoSerializer(many=True, required=False, read_only=True)
 
     class Meta:
         model = Marker
@@ -29,25 +30,20 @@ class MarkerSerializer(serializers.ModelSerializer):
             "description",
             "region_type",
             "pollution_type",
+            "pollution_type_name",
             "photos",
             "created_at",
         )
         read_only_fields = ("id", "created_at")
 
     def create(self, validated_data):
-        pollution_type_data = validated_data.pop("pollution_type")
-        photos_data = validated_data.pop("photos", [])
+        pollution_type_name = validated_data.pop("pollution_type_name")
+        photos_data = self.context.get('photos', [])
 
-        pollution_type, created = PollutionType.objects.get_or_create(
-            name=pollution_type_data["name"],
-            defaults={"description": pollution_type_data.get("description", "")},
-        )
-        if not created and "description" in pollution_type_data:
-            # Обновим описание, если пришло новое значение
-            description = pollution_type_data.get("description")
-            if description and description != pollution_type.description:
-                pollution_type.description = description
-                pollution_type.save(update_fields=["description"])
+        try:
+            pollution_type = PollutionType.objects.get(name=pollution_type_name)
+        except PollutionType.DoesNotExist:
+            raise serializers.ValidationError({"pollution_type_name": f"Тип загрязнения '{pollution_type_name}' не найден"})
 
         marker = Marker.objects.create(pollution_type=pollution_type, **validated_data)
 
@@ -57,23 +53,18 @@ class MarkerSerializer(serializers.ModelSerializer):
         return marker
 
     def update(self, instance, validated_data):
-        pollution_type_data = validated_data.pop("pollution_type", None)
-        photos_data = validated_data.pop("photos", None)
+        pollution_type_name = validated_data.pop("pollution_type_name", None)
+        photos_data = self.context.get('photos', None)
+
+        if pollution_type_name:
+            try:
+                pollution_type = PollutionType.objects.get(name=pollution_type_name)
+                instance.pollution_type = pollution_type
+            except PollutionType.DoesNotExist:
+                raise serializers.ValidationError({"pollution_type_name": f"Тип загрязнения '{pollution_type_name}' не найден"})
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-
-        if pollution_type_data:
-            pollution_type, created = PollutionType.objects.get_or_create(
-                name=pollution_type_data["name"],
-                defaults={"description": pollution_type_data.get("description", "")},
-            )
-            if not created and "description" in pollution_type_data:
-                description = pollution_type_data.get("description")
-                if description and description != pollution_type.description:
-                    pollution_type.description = description
-                    pollution_type.save(update_fields=["description"])
-            instance.pollution_type = pollution_type
 
         instance.save()
 
