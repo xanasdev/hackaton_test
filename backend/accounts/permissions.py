@@ -13,6 +13,8 @@ class AdminPermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
+        elif request.user.is_superuser:
+            return True
         return request.user.has_permission('admin_access')
 
 class ManagerPermission(BasePermission):
