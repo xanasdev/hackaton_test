@@ -4,11 +4,13 @@ from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, Role
-from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserSerializer, RoleSerializer
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserSerializer, RoleSerializer, AssignRoleSerializer
 from .permissions import admin_required, manager_required
 
+@extend_schema(request=UserRegistrationSerializer)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
@@ -23,6 +25,7 @@ def register(request):
         })
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@extend_schema(request=UserLoginSerializer)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
@@ -37,6 +40,7 @@ def login(request):
         })
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@extend_schema(responses=UserSerializer)
 @api_view(['GET'])
 def profile(request):
     return Response(UserSerializer(request.user).data)
@@ -73,6 +77,7 @@ def manager_endpoint(request):
     return Response({'message': 'Для менеджеров и выше'})
 
 # Эндпоинт для назначения роли (без ограничений для тестирования)
+@extend_schema(request=AssignRoleSerializer)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def assign_role(request):

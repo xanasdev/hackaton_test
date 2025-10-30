@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'accounts',
     'rest_framework',
     'rest_framework_simplejwt',
+    'drf_spectacular',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,6 +54,28 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Hakaton API',
+    'DESCRIPTION': 'Документация API проекта Hakaton',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,  # если True — schema будет включена в Swagger UI
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SECURITY': [{'BearerAuth': []}],  # подключить по умолчанию Bearer на все эндпоинты (опционально)
+    'SECURITY_SCHEMES': {
+        'BearerAuth': {
+            'type': 'http',
+            'scheme': 'bearer',
+            'bearerFormat': 'JWT',
+        },
+    },
+    # Дополнительные опции для Swagger UI
+    'SWAGGER_UI_SETTINGS': {
+        # Сохранять введённый токен между перезагрузками UI
+        'persistAuthorization': True,
+    },
 }
 
 SIMPLE_JWT = {
