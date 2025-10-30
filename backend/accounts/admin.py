@@ -1,4 +1,3 @@
-# ✅ НОВЫЙ ФАЙЛ: Админ панель для управления пользователями и ролями
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import User, Role

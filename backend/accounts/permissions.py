@@ -1,4 +1,3 @@
-# ✅ НОВЫЙ ФАЙЛ: Система разрешений на основе ролей
 from rest_framework.permissions import BasePermission
 
 class HasRolePermission(BasePermission):
