@@ -1,26 +1,41 @@
 from rest_framework.permissions import BasePermission
 
-class HasRolePermission(BasePermission):
-    def __init__(self, required_permission):
-        self.required_permission = required_permission
-    
+def create_role_permission(required_permission):
+    class RolePermission(BasePermission):
+        def has_permission(self, request, view):
+            if not request.user.is_authenticated:
+                return False
+            return request.user.has_permission(required_permission)
+    return RolePermission
+
+# Готовые классы разрешений
+class AdminPermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
-        return request.user.has_permission(self.required_permission)
+        return request.user.has_permission('admin_access')
 
-def require_permission(permission):
-    def decorator(view_class):
-        view_class.permission_classes = [HasRolePermission(permission)]
-        return view_class
-    return decorator
+class ManagerPermission(BasePermission):
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        return request.user.has_permission('manager_access')
 
-# Готовые декораторы для ролей
+class UserPermission(BasePermission):
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        return request.user.has_permission('user_access')
+
+# Декораторы для классов
 def admin_required(view_class):
-    return require_permission('admin_access')(view_class)
+    view_class.permission_classes = [AdminPermission]
+    return view_class
 
 def manager_required(view_class):
-    return require_permission('manager_access')(view_class)
+    view_class.permission_classes = [ManagerPermission]
+    return view_class
 
 def user_required(view_class):
-    return require_permission('user_access')(view_class)
+    view_class.permission_classes = [UserPermission]
+    return view_class

@@ -71,3 +71,19 @@ def admin_only_endpoint(request):
 @manager_required
 def manager_endpoint(request):
     return Response({'message': 'Для менеджеров и выше'})
+
+# Эндпоинт для назначения роли (без ограничений для тестирования)
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def assign_role(request):
+    user_id = request.data.get('user_id')
+    role_id = request.data.get('role_id')
+    
+    try:
+        user = User.objects.get(id=user_id)
+        role = Role.objects.get(id=role_id)
+        user.role = role
+        user.save()
+        return Response({'message': f'Роль {role.name} назначена пользователю {user.username}'})
+    except (User.DoesNotExist, Role.DoesNotExist):
+        return Response({'error': 'Пользователь или роль не найдены'}, status=400)
