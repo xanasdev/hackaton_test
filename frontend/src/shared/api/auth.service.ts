@@ -1,40 +1,71 @@
-import axiosInstance from '@/shared/lib/axios'
-import { User } from '@/shared/types'
 import Cookies from 'js-cookie'
+import api from '../lib/axios'
+import {AuthTokens, User} from '../types'
 
-interface LoginDto {
-  email: string
-  password: string
+interface LoginCredentials {
+	username: string
+	password: string
 }
 
-interface RegisterDto extends LoginDto {
-  name: string
+interface RegisterData {
+	username: string
+	email: string
+	password: string
+	password_confirm: string
+	first_name?: string
+	last_name?: string
+	phone?: string
 }
 
-interface AuthResponse {
-  user: User
-  token: string
+interface LoginResponse {
+	access: string
+	refresh: string
+	user: User
+}
+
+interface RegisterResponse {
+	user: User
+	access: string
+	refresh: string
 }
 
 export const authService = {
-  async login(data: LoginDto): Promise<AuthResponse> {
-    const response = await axiosInstance.post<AuthResponse>('/auth/login', data)
-    Cookies.set('auth_token', response.data.token, { expires: 7 })
-    return response.data
-  },
+	async login(credentials: LoginCredentials): Promise<LoginResponse> {
+		const {data} = await api.post<LoginResponse>('/auth/login/', credentials)
+		Cookies.set('access_token', data.access, {expires: 1}) // 1 day
+		Cookies.set('refresh_token', data.refresh, {expires: 7}) // 7 days
+		return data
+	},
 
-  async register(data: RegisterDto): Promise<AuthResponse> {
-    const response = await axiosInstance.post<AuthResponse>('/auth/register', data)
-    Cookies.set('auth_token', response.data.token, { expires: 7 })
-    return response.data
-  },
+	async register(userData: RegisterData): Promise<RegisterResponse> {
+		const {data} = await api.post<RegisterResponse>('/auth/register/', userData)
+		Cookies.set('access_token', data.access, {expires: 1})
+		Cookies.set('refresh_token', data.refresh, {expires: 7})
+		return data
+	},
 
-  async getCurrentUser(): Promise<User> {
-    const response = await axiosInstance.get<User>('/auth/me')
-    return response.data
-  },
+	async getCurrentUser(): Promise<User> {
+		const {data} = await api.get<User>('/auth/profile/')
+		return {
+			...data,
+			name:
+				data.first_name && data.last_name
+					? `${data.first_name} ${data.last_name}`.trim()
+					: data.username,
+		}
+	},
 
-  logout() {
-    Cookies.remove('auth_token')
-  },
+	async refreshToken(refresh: string): Promise<AuthTokens> {
+		const {data} = await api.post<AuthTokens>('/auth/token/refresh/', {
+			refresh,
+		})
+		Cookies.set('access_token', data.access, {expires: 1})
+		return data
+	},
+
+	async logout(): Promise<void> {
+		Cookies.remove('access_token')
+		Cookies.remove('refresh_token')
+		return Promise.resolve()
+	},
 }

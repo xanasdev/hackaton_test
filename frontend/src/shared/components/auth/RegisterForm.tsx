@@ -19,9 +19,9 @@ export function RegisterForm({ onSubmit, isLoading }: RegisterFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <div className={styles.formGroup}>
-        <Label htmlFor="name">Name</Label>
-        <Input {...register('name')} placeholder="Your name" />
-        {errors.name && <p className={styles.errorText}>{errors.name.message}</p>}
+        <Label htmlFor="username">Username</Label>
+        <Input {...register('username')} placeholder="username" />
+        {errors.username && <p className={styles.errorText}>{errors.username.message}</p>}
       </div>
 
       <div className={styles.formGroup}>
@@ -34,6 +34,12 @@ export function RegisterForm({ onSubmit, isLoading }: RegisterFormProps) {
         <Label htmlFor="password">Password</Label>
         <Input {...register('password')} type="password" placeholder="••••••••" />
         {errors.password && <p className={styles.errorText}>{errors.password.message}</p>}
+      </div>
+
+      <div className={styles.formGroup}>
+        <Label htmlFor="password_confirm">Confirm Password</Label>
+        <Input {...register('password_confirm')} type="password" placeholder="••••••••" />
+        {errors.password_confirm && <p className={styles.errorText}>{errors.password_confirm.message}</p>}
       </div>
 
       <Button type="submit" disabled={isLoading} className="w-full">

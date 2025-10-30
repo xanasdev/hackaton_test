@@ -35,36 +35,30 @@ export const useMapActions = ({
     if (!newPointCoords) return
     createPoint(
       {
-        latitude: newPointCoords[0],
-        longitude: newPointCoords[1],
-        type: data.type,
+        latitude: newPointCoords[0].toString(),
+        longitude: newPointCoords[1].toString(),
         description: data.description,
-        photos: data.photos,
-        region: data.region,
+        region_type: data.region || 'Unknown',
+        pollution_type: {
+          name: data.type,
+          description: '',
+        },
       },
       {
         onSuccess: () => {
-          toast.success('Pollution point reported successfully')
+          toast.success('Метка успешно создана')
           setReportDialogOpen(false)
           setNewPointCoords(null)
         },
-        onError: () => toast.error('Failed to report pollution point'),
+        onError: () => toast.error('Не удалось создать метку'),
       }
     )
   }
 
-  const handleStatusChange = (status: PollutionStatus) => {
+  const handleStatusChange = (_status: PollutionStatus) => {
     if (!selectedPoint) return
-    updatePoint(
-      { id: selectedPoint.id, data: { status } },
-      {
-        onSuccess: () => {
-          toast.success('Status updated successfully')
-          setSelectedPoint(null)
-        },
-        onError: () => toast.error('Failed to update status'),
-      }
-    )
+    toast.info('Обновление статуса не поддерживается')
+    setSelectedPoint(null)
   }
 
   const handleDelete = () => {

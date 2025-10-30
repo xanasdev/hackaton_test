@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { authService } from '@/shared/api/auth.service'
 import { useRouter } from 'next/navigation'
+import Cookies from 'js-cookie'
 
 export const useAuth = () => {
   const queryClient = useQueryClient()
@@ -8,8 +9,16 @@ export const useAuth = () => {
 
   const { data: user, isLoading } = useQuery({
     queryKey: ['user'],
-    queryFn: authService.getCurrentUser,
+    queryFn: async () => {
+      // Check token before making request
+      const hasToken = !!Cookies.get('access_token')
+      if (!hasToken) {
+        throw new Error('No token')
+      }
+      return authService.getCurrentUser()
+    },
     retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
   const loginMutation = useMutation({

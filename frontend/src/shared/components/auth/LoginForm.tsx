@@ -19,9 +19,9 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <div className={styles.formGroup}>
-        <Label htmlFor="email">Email</Label>
-        <Input {...register('email')} type="email" placeholder="your@email.com" />
-        {errors.email && <p className={styles.errorText}>{errors.email.message}</p>}
+        <Label htmlFor="username">Username</Label>
+        <Input {...register('username')} placeholder="username" />
+        {errors.username && <p className={styles.errorText}>{errors.username.message}</p>}
       </div>
 
       <div className={styles.formGroup}>

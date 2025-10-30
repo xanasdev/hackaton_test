@@ -15,17 +15,30 @@ export const getMarkerColor = (status: PollutionStatus): string => {
   }
 }
 
-export const getMarkerIcon = (type: PollutionType): string => {
-  switch (type) {
+export const getMarkerIcon = (type: PollutionType | string): string => {
+  // Handle both enum and string types
+  const typeStr = typeof type === 'string' ? type.toLowerCase() : type
+  
+  switch (typeStr) {
     case PollutionType.TRASH:
+    case 'trash':
+    case 'мусор':
       return '🗑️'
     case PollutionType.OIL_SPILL:
+    case 'oil_spill':
+    case 'нефть':
       return '🛢️'
     case PollutionType.INDUSTRIAL_WASTE:
+    case 'industrial_waste':
+    case 'промышленные отходы':
       return '🏭'
     case PollutionType.SEWAGE:
+    case 'sewage':
+    case 'сточные воды':
       return '💧'
     case PollutionType.PLASTIC:
+    case 'plastic':
+    case 'пластик':
       return '♻️'
     default:
       return '⚠️'

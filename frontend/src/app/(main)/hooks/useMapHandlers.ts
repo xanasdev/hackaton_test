@@ -32,21 +32,25 @@ export const useMapHandlers = () => {
 
     createPoint(
       {
-        latitude: newPointCoords[0],
-        longitude: newPointCoords[1],
-        type: data.type,
+        latitude: newPointCoords[0].toString(),
+        longitude: newPointCoords[1].toString(),
         description: data.description,
-        photos: data.photos,
-        region: data.region,
+        region_type: data.region || 'Unknown',
+        pollution_type: {
+          name: data.type,
+          description: '',
+        },
+        // Photos will be handled separately - Django expects image_path
+        // For now, skip photos in creation
       },
       {
         onSuccess: () => {
-          toast.success('Pollution point reported successfully')
+          toast.success('Метка успешно создана')
           setReportDialogOpen(false)
           setNewPointCoords(null)
         },
         onError: () => {
-          toast.error('Failed to report pollution point')
+          toast.error('Не удалось создать метку')
         },
       }
     )
@@ -54,19 +58,9 @@ export const useMapHandlers = () => {
 
   const handleStatusChange = (status: PollutionStatus) => {
     if (!selectedPoint) return
-
-    updatePoint(
-      { id: selectedPoint.id, data: { status } },
-      {
-        onSuccess: () => {
-          toast.success('Status updated successfully')
-          setSelectedPoint(null)
-        },
-        onError: () => {
-          toast.error('Failed to update status')
-        },
-      }
-    )
+    // Django doesn't have status field
+    toast.info('Обновление статуса не поддерживается')
+    setSelectedPoint(null)
   }
 
   const handleDelete = () => {

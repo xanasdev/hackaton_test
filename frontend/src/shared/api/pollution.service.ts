@@ -1,69 +1,121 @@
-import axiosInstance from '@/shared/lib/axios'
+import api from '../lib/axios'
 import {
-  PollutionPoint,
-  CreatePollutionPointDto,
-  UpdatePollutionPointDto,
-  PollutionStats,
-  PollutionStatus,
-  PollutionType,
+	Marker,
+	PollutionTypeModel,
+	PollutionStats,
+	PollutionType,
 } from '@/shared/types'
 
-interface GetPollutionPointsParams {
-  status?: PollutionStatus
-  type?: PollutionType
-  region?: string
-  limit?: number
-  offset?: number
+interface GetMarkersParams {
+	pollution_type?: number
+	region_type?: string
+	search?: string
+}
+
+interface CreateMarkerDto {
+	latitude: string
+	longitude: string
+	description: string
+	region_type: string
+	pollution_type: {
+		name: string
+		description?: string
+	}
+	photos?: Array<{image_path: string}>
+}
+
+interface UpdateMarkerDto {
+	latitude?: string
+	longitude?: string
+	description?: string
+	region_type?: string
+	pollution_type?: {
+		name: string
+		description?: string
+	}
 }
 
 export const pollutionService = {
-  async getAll(params?: GetPollutionPointsParams): Promise<PollutionPoint[]> {
-    const response = await axiosInstance.get<PollutionPoint[]>('/pollution', { params })
-    return response.data
-  },
+	async getAll(params?: GetMarkersParams): Promise<Marker[]> {
+		const {data} = await api.get<Marker[]>('/markers/', {params})
+		return data
+	},
 
-  async getById(id: string): Promise<PollutionPoint> {
-    const response = await axiosInstance.get<PollutionPoint>(`/pollution/${id}`)
-    return response.data
-  },
+	async getById(id: number): Promise<Marker> {
+		const {data} = await api.get<Marker>(`/markers/${id}/`)
+		return data
+	},
 
-  async create(data: CreatePollutionPointDto): Promise<PollutionPoint> {
-    const formData = new FormData()
-    formData.append('latitude', data.latitude.toString())
-    formData.append('longitude', data.longitude.toString())
-    formData.append('type', data.type)
-    formData.append('description', data.description)
-    if (data.region) formData.append('region', data.region)
-    
-    data.photos.forEach((photo) => {
-      formData.append('photos', photo)
-    })
+	async create(markerData: CreateMarkerDto): Promise<Marker> {
+		const {data} = await api.post<Marker>('/markers/', markerData)
+		return data
+	},
 
-    const response = await axiosInstance.post<PollutionPoint>('/pollution', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
-    return response.data
-  },
+	async update(id: number, markerData: UpdateMarkerDto): Promise<Marker> {
+		const {data} = await api.put<Marker>(`/markers/${id}/`, markerData)
+		return data
+	},
 
-  async update(id: string, data: UpdatePollutionPointDto): Promise<PollutionPoint> {
-    const response = await axiosInstance.patch<PollutionPoint>(`/pollution/${id}`, data)
-    return response.data
-  },
+	async patch(id: number, markerData: Partial<UpdateMarkerDto>): Promise<Marker> {
+		const {data} = await api.patch<Marker>(`/markers/${id}/`, markerData)
+		return data
+	},
 
-  async delete(id: string): Promise<void> {
-    await axiosInstance.delete(`/pollution/${id}`)
-  },
+	async delete(id: number): Promise<void> {
+		await api.delete(`/markers/${id}/`)
+	},
 
-  async getStats(): Promise<PollutionStats> {
-    const response = await axiosInstance.get<PollutionStats>('/pollution/stats')
-    return response.data
-  },
+	async getPollutionTypes(): Promise<PollutionTypeModel[]> {
+		const {data} = await api.get<PollutionTypeModel[]>('/pollution-types/')
+		return data
+	},
 
-  async exportReport(params?: GetPollutionPointsParams): Promise<Blob> {
-    const response = await axiosInstance.get('/pollution/export', {
-      params,
-      responseType: 'blob',
-    })
-    return response.data
-  },
+	async getStats(): Promise<PollutionStats> {
+		const markers = await this.getAll()
+		return {
+			total: markers.length,
+			reported: markers.length, // All markers are reported by default
+			inProgress: 0,
+			cleaned: 0,
+			byType: {} as Record<PollutionType, number>,
+			byRegion: markers.reduce(
+				(acc, m) => {
+					acc[m.region_type] = (acc[m.region_type] || 0) + 1
+					return acc
+				},
+				{} as Record<string, number>,
+			),
+		}
+	},
+
+
+	async exportReport(params?: GetMarkersParams): Promise<Blob> {
+		const markers = await this.getAll(params)
+		// Convert to CSV
+		const csv = this.convertToCSV(markers)
+		return new Blob([csv], {type: 'text/csv'})
+	},
+
+	// Helper: Convert markers to CSV
+	convertToCSV(markers: Marker[]): string {
+		const headers = [
+			'ID',
+			'Latitude',
+			'Longitude',
+			'Type',
+			'Region',
+			'Description',
+			'Created',
+		]
+		const rows = markers.map((m) => [
+			m.id,
+			m.latitude,
+			m.longitude,
+			m.pollution_type.name,
+			m.region_type,
+			m.description,
+			m.created_at,
+		])
+		return [headers, ...rows].map((row) => row.join(',')).join('\n')
+	},
 }

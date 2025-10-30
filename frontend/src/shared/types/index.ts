@@ -1,3 +1,9 @@
+export interface PollutionTypeModel {
+  id: number
+  name: string
+  description: string
+}
+
 export enum PollutionType {
   TRASH = 'trash',
   OIL_SPILL = 'oil_spill',
@@ -7,42 +13,60 @@ export enum PollutionType {
   OTHER = 'other',
 }
 
-export enum PollutionStatus {
-  REPORTED = 'reported',
-  IN_PROGRESS = 'in_progress',
-  CLEANED = 'cleaned',
-  VERIFIED = 'verified',
+export interface MarkerPhoto {
+  id: number
+  image_path: string
+  uploaded_at: string
 }
 
-export enum UserRole {
-  USER = 'user',
-  ACTIVIST = 'activist',
-  ADMIN = 'admin',
+export interface Marker {
+  id: number
+  latitude: string
+  longitude: string
+  description: string
+  region_type: string
+  pollution_type: PollutionTypeModel
+  photos: MarkerPhoto[]
+  created_at: string
+}
+
+export interface Role {
+  id: number
+  name: string
+  description: string
+  permissions: string[]
 }
 
 export interface User {
-  id: string
+  id: number
+  username: string
   email: string
-  name: string
-  role: UserRole
+  first_name: string
+  last_name: string
+  phone: string
+  role: number | null
+  role_name?: string
+  name?: string // Computed field: first_name + last_name
   avatar?: string
-  createdAt: string
 }
 
-export interface PollutionPoint {
-  id: string
-  latitude: number
-  longitude: number
-  type: PollutionType
-  status: PollutionStatus
-  description: string
-  photos: string[]
-  reportedBy: User
-  assignedTo?: User
-  createdAt: string
-  updatedAt: string
-  region?: string
-  severity?: number
+export interface AuthTokens {
+  access: string
+  refresh: string
+}
+
+// Legacy types for compatibility
+export type PollutionPoint = Marker
+export enum PollutionStatus {
+  REPORTED = 'REPORTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  CLEANED = 'CLEANED',
+  VERIFIED = 'VERIFIED',
+}
+export enum UserRole {
+  CITIZEN = 'CITIZEN',
+  ACTIVIST = 'ACTIVIST',
+  ADMIN = 'ADMIN',
 }
 
 export interface PollutionStats {

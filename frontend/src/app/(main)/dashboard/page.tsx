@@ -15,7 +15,7 @@ import {
 import {useAuth} from '@/shared/hooks/use-auth'
 import {usePollution} from '@/shared/hooks/use-pollution'
 import styles from '@/shared/styles/dashboard-page.module.css'
-import {PollutionStatus, UserRole} from '@/shared/types'
+import {PollutionStatus} from '@/shared/types'
 import {Download} from 'lucide-react'
 import {useState} from 'react'
 import {toast} from 'sonner'
@@ -25,10 +25,11 @@ export default function DashboardPage() {
 	const [activeTab, setActiveTab] = useState<PollutionStatus>(
 		PollutionStatus.REPORTED,
 	)
-	const {points, stats, updatePoint} = usePollution({status: activeTab})
+	const {points, stats} = usePollution({status: activeTab})
 
+	// Check if user has activist or admin role by role_name
 	const canManage =
-		user?.role === UserRole.ACTIVIST || user?.role === UserRole.ADMIN
+		user?.role_name === 'ACTIVIST' || user?.role_name === 'ADMIN'
 
 	if (!canManage) {
 		return (
@@ -49,26 +50,16 @@ export default function DashboardPage() {
 
 	const handleExport = async () => {
 		try {
-			const blob = await pollutionService.exportReport({status: activeTab})
+			const blob = await pollutionService.exportReport()
 			const url = window.URL.createObjectURL(blob)
 			const a = document.createElement('a')
 			a.href = url
-			a.download = `pollution-report-${activeTab}-${Date.now()}.csv`
+			a.download = `pollution-report-${Date.now()}.csv`
 			a.click()
 			toast.success('Отчет успешно экспортирован')
 		} catch {
 			toast.error('Не удалось экспортировать отчет')
 		}
-	}
-
-	const handleStatusChange = (id: string, status: PollutionStatus) => {
-		updatePoint(
-			{id, data: {status}},
-			{
-				onSuccess: () => toast.success('Статус обновлен'),
-				onError: () => toast.error('Не удалось обновить статус'),
-			},
-		)
 	}
 
 	return (
@@ -109,7 +100,6 @@ export default function DashboardPage() {
 									<PollutionCard
 										key={point.id}
 										point={point}
-										onStatusChange={handleStatusChange}
 									/>
 								))}
 							</div>

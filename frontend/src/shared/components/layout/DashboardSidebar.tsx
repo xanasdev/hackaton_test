@@ -122,24 +122,16 @@ export function DashboardSidebar({
 								>
 									<div className={styles.pointIcon}>
 										<span className={styles.emoji}>
-											{getMarkerIcon(point.type)}
+											{getMarkerIcon(point.pollution_type.name)}
 										</span>
 									</div>
 									<div className={styles.pointContent}>
 										<div className={styles.pointTop}>
 											<p className={styles.pointTitle}>
-												{point.type.replace(/_/g, ' ')}
+												{point.pollution_type.name.replace(/_/g, ' ')}
 											</p>
-											<Badge
-												variant={getStatusColor(point.status)}
-												className={styles.statusBadge}
-											>
-												{point.status === PollutionStatus.REPORTED && 'Новое'}
-												{point.status === PollutionStatus.IN_PROGRESS &&
-													'В работе'}
-												{point.status === PollutionStatus.CLEANED && 'Очищено'}
-												{point.status === PollutionStatus.VERIFIED &&
-													'Проверено'}
+											<Badge variant='secondary' className={styles.statusBadge}>
+												{point.region_type}
 											</Badge>
 										</div>
 										<p className={styles.pointDescription}>
@@ -148,7 +140,7 @@ export function DashboardSidebar({
 												: point.description}
 										</p>
 										<p className={styles.pointDate}>
-											{new Date(point.createdAt).toLocaleDateString('ru-RU', {
+											{new Date(point.created_at).toLocaleDateString('ru-RU', {
 												day: 'numeric',
 												month: 'short',
 												year: 'numeric',

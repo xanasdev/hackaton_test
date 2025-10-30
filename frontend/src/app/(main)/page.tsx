@@ -14,6 +14,7 @@ import {useAuth} from '@/shared/hooks/use-auth'
 import {useGeolocation} from '@/shared/hooks/use-geolocation'
 import {usePollution} from '@/shared/hooks/use-pollution'
 import {findNearbyPoints} from '@/shared/utils/distance.utils'
+import {UserRole} from '@/shared/types'
 import {useMemo, useState} from 'react'
 import {useMapActions} from './hooks/useMapActions'
 import {useMapState} from './hooks/useMapState'
@@ -102,7 +103,7 @@ export default function HomePage() {
 
 			<PointDetailsDrawer
 				point={selectedPoint}
-				userRole={user?.role}
+				userRole={user?.role_name as UserRole | undefined}
 				onClose={() => setSelectedPoint(null)}
 				onStatusChange={handleStatusChange}
 				onDelete={handleDelete}

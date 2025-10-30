@@ -1,26 +1,25 @@
-# Caspian Sea Clean Map
+# Caspian Sea Clean Map - Frontend
 
 Interactive pollution tracking platform for the Caspian Sea coastal region.
 
 ## Features
 
 - **Interactive Map**: Yandex Maps integration for marking pollution points
-- **User Roles**: Support for citizens, activists, and administrators
-- **Real-time Updates**: Live pollution point tracking and status updates
+- **User Authentication**: JWT-based authentication with Django backend
 - **Photo Upload**: Document pollution with images
-- **Filtering**: Filter by status, type, and region
+- **Filtering**: Filter by pollution type and region
 - **Statistics**: Dashboard with pollution analytics
-- **Export Reports**: CSV export for data analysis
+- **Role-based Access**: Support for different user roles
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 with App Router
+- **Framework**: Next.js 15 with App Router
 - **UI**: shadcn/ui components with Tailwind CSS
 - **State Management**: TanStack Query (React Query)
 - **Maps**: Yandex Maps API
 - **Forms**: React Hook Form with Zod validation
-- **HTTP Client**: Axios with interceptors
-- **Cookies**: js-cookie
+- **HTTP Client**: Axios with JWT interceptors
+- **Backend**: Django REST Framework
 
 ## Getting Started
 
@@ -28,6 +27,7 @@ Interactive pollution tracking platform for the Caspian Sea coastal region.
 
 - Node.js 18+
 - npm or yarn
+- Django backend running on `http://localhost:8000`
 
 ### Installation
 
@@ -40,7 +40,7 @@ npm install
 Create a `.env.local` file:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001/api
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
 NEXT_PUBLIC_YANDEX_MAPS_KEY=your_yandex_maps_api_key
 ```
 
@@ -51,6 +51,27 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000)
+
+## Backend Integration
+
+### Django API Endpoints
+
+**Authentication** (`/api/auth/`):
+- `POST /auth/register/` - User registration
+- `POST /auth/login/` - User login (returns JWT tokens)
+- `POST /auth/token/refresh/` - Refresh access token
+- `GET /auth/profile/` - Get current user profile
+
+**Markers** (`/api/markers/`):
+- `GET /api/markers/` - List all markers
+- `POST /api/markers/` - Create new marker
+- `GET /api/markers/{id}/` - Get marker details
+- `PUT /api/markers/{id}/` - Update marker
+- `DELETE /api/markers/{id}/` - Delete marker
+
+**Pollution Types** (`/api/pollution-types/`):
+- `GET /api/pollution-types/` - List all pollution types
+- `POST /api/pollution-types/` - Create pollution type
 
 ## Project Structure
 

@@ -82,13 +82,13 @@ export function NearbyDangerList({
                   tabIndex={0}
                 >
                   <div className={styles.itemIcon}>
-                    <span className={styles.emoji}>{getMarkerIcon(point.type)}</span>
+                    <span className={styles.emoji}>{getMarkerIcon(point.pollution_type.name)}</span>
                   </div>
 
                   <div className={styles.itemContent}>
                     <div className={styles.itemHeader}>
                       <span className={styles.itemTitle}>
-                        {point.type.replace(/_/g, ' ')}
+                        {point.pollution_type.name.replace(/_/g, ' ')}
                       </span>
                       <Badge variant={DANGER_COLORS[dangerLevel]} className={styles.dangerBadge}>
                         {DANGER_LABELS[dangerLevel]}
@@ -102,12 +102,12 @@ export function NearbyDangerList({
                     </p>
 
                     <div className={styles.itemFooter}>
-                      <div className={styles.distance}>
+                      <div className={styles.itemMeta}>
                         <Navigation className="h-3 w-3" />
                         <span>{formatDistance(point.distance)} away</span>
                       </div>
                       <Badge variant="outline" className={styles.statusBadge}>
-                        {point.status}
+                        {point.region_type}
                       </Badge>
                     </div>
                   </div>
