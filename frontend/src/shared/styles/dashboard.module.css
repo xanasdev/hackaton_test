@@ -1,14 +1,39 @@
 .container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: hsl(var(--background));
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  z-index: 10;
+}
+
+.content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 400px;
+  border-right: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
 }
 
 .title {

@@ -1,16 +1,15 @@
 'use client'
 
-import {MapActionButtons} from '@/shared/components/actions/MapActionButtons'
 import {ReportPollutionDialog} from '@/shared/components/dialogs/ReportPollutionDialog'
-import {HelpButton} from '@/shared/components/help/HelpButton'
-import {MapInstructions} from '@/shared/components/help/MapInstructions'
+import {DashboardLayout} from '@/shared/components/layout/DashboardLayout'
+import {DashboardHeader} from '@/shared/components/layout/DashboardHeader'
+import {DashboardSidebar} from '@/shared/components/layout/DashboardSidebar'
 import {MapMarkersList} from '@/shared/components/map/MapMarkersList'
 import {MapWrapper} from '@/shared/components/map/MapWrapper'
 import {YandexMapView} from '@/shared/components/map/YandexMapView'
 import {NearbyDangerList} from '@/shared/components/nearby/NearbyDangerList'
 import {FilterDrawer} from '@/shared/components/sheets/FilterDrawer'
 import {PointDetailsDrawer} from '@/shared/components/sheets/PointDetailsDrawer'
-import {StatsOverlay} from '@/shared/components/stats/StatsOverlay'
 import {useAuth} from '@/shared/hooks/use-auth'
 import {useGeolocation} from '@/shared/hooks/use-geolocation'
 import {usePollution} from '@/shared/hooks/use-pollution'
@@ -21,7 +20,6 @@ import {useMapState} from './hooks/useMapState'
 
 export default function HomePage() {
 	const {user} = useAuth()
-	const [showInstructions, setShowInstructions] = useState(true)
 	const [nearbyDismissed, setNearbyDismissed] = useState(false)
 	const location = useGeolocation()
 
@@ -57,39 +55,41 @@ export default function HomePage() {
 		return findNearbyPoints(location.latitude, location.longitude, points, 50)
 	}, [location.latitude, location.longitude, points])
 
-	// Derive showNearby from state instead of using effect
-	const showNearby = nearbyPoints.length > 0 && !nearbyDismissed && !!location.latitude
+	const showNearby =
+		nearbyPoints.length > 0 && !nearbyDismissed && !!location.latitude
 
 	return (
-		<MapWrapper>
-			<YandexMapView onMapClick={handleMapClick}>
-				<MapMarkersList points={points} onMarkerClick={setSelectedPoint} />
-			</YandexMapView>
+		<>
+			<DashboardLayout
+				header={<DashboardHeader />}
+				sidebar={
+					<DashboardSidebar
+						stats={stats}
+						points={points}
+						onPointClick={setSelectedPoint}
+						onFilterClick={() => setFilterOpen(true)}
+						onReportClick={() => setReportDialogOpen(true)}
+					/>
+				}
+				map={
+					<MapWrapper>
+						<YandexMapView onMapClick={handleMapClick}>
+							<MapMarkersList points={points} onMarkerClick={setSelectedPoint} />
+						</YandexMapView>
 
-			{showInstructions && (
-				<MapInstructions onClose={() => setShowInstructions(false)} />
-			)}
-			{!showInstructions && (
-				<HelpButton onClick={() => setShowInstructions(true)} />
-			)}
-
-			{showNearby && location.latitude && location.longitude && (
-				<NearbyDangerList
-					nearbyPoints={nearbyPoints}
-					userLocation={{
-						latitude: location.latitude,
-						longitude: location.longitude,
-					}}
-					onPointClick={setSelectedPoint}
-					onClose={() => setNearbyDismissed(true)}
-				/>
-			)}
-
-			<StatsOverlay stats={stats} />
-
-			<MapActionButtons
-				onFilterClick={() => setFilterOpen(true)}
-				onReportClick={() => setReportDialogOpen(true)}
+						{showNearby && location.latitude && location.longitude && (
+							<NearbyDangerList
+								nearbyPoints={nearbyPoints}
+								userLocation={{
+									latitude: location.latitude,
+									longitude: location.longitude,
+								}}
+								onPointClick={setSelectedPoint}
+								onClose={() => setNearbyDismissed(true)}
+							/>
+						)}
+					</MapWrapper>
+				}
 			/>
 
 			<ReportPollutionDialog
@@ -117,6 +117,6 @@ export default function HomePage() {
 				onTypeChange={(type) => setFilters((f) => ({...f, type}))}
 				onReset={() => setFilters({})}
 			/>
-		</MapWrapper>
+		</>
 	)
 }
