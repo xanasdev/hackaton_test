@@ -1,4 +1,6 @@
-import { PollutionPoint, PollutionStatus, PollutionType } from '@/shared/types'
+import { PollutionPoint, PollutionStatus } from '@/shared/types'
+import { YandexMapEvent, ReportData } from '@/shared/interfaces/map.interface'
+import { extractCoordinates } from '@/shared/utils/map.utils'
 import { toast } from 'sonner'
 
 interface UseMapActionsProps {
@@ -20,15 +22,15 @@ export const useMapActions = ({
   deletePoint,
   selectedPoint,
 }: UseMapActionsProps) => {
-  const handleMapClick = (e: any) => {
-    const coords = e.get('coords') as [number, number]
+  const handleMapClick = (e: YandexMapEvent) => {
+    const coords = extractCoordinates(e)
     setNewPointCoords(coords)
     setReportDialogOpen(true)
   }
 
   const handleReportSubmit = (
     newPointCoords: [number, number] | null,
-    data: { type: PollutionType; description: string; photos: File[]; region?: string }
+    data: ReportData
   ) => {
     if (!newPointCoords) return
     createPoint(

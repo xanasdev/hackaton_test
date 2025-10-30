@@ -1,19 +1,10 @@
 import { Placemark } from '@pbe/react-yandex-maps'
-import { PollutionPoint, PollutionStatus } from '@/shared/types'
+import { PollutionPoint } from '@/shared/types'
+import { getMarkerColor } from '@/shared/utils/marker.utils'
 
 interface MapMarkersListProps {
   points: PollutionPoint[]
   onMarkerClick: (point: PollutionPoint) => void
-}
-
-const getMarkerColor = (status: PollutionStatus): string => {
-  switch (status) {
-    case PollutionStatus.REPORTED: return '#ef4444'
-    case PollutionStatus.IN_PROGRESS: return '#f59e0b'
-    case PollutionStatus.CLEANED: return '#10b981'
-    case PollutionStatus.VERIFIED: return '#3b82f6'
-    default: return '#6b7280'
-  }
 }
 
 export function MapMarkersList({ points, onMarkerClick }: MapMarkersListProps) {

@@ -1,41 +1,10 @@
-import {PollutionPoint, PollutionStatus, PollutionType} from '@/shared/types'
-import {Placemark} from '@pbe/react-yandex-maps'
+import { Placemark } from '@pbe/react-yandex-maps'
+import { PollutionPoint } from '@/shared/types'
+import { getMarkerColor, getMarkerIcon } from '@/shared/utils/marker.utils'
 
 interface PollutionMarkerProps {
-	point: PollutionPoint
-	onClick: (point: PollutionPoint) => void
-}
-
-const getMarkerColor = (status: PollutionStatus): string => {
-	switch (status) {
-		case PollutionStatus.REPORTED:
-			return '#ef4444'
-		case PollutionStatus.IN_PROGRESS:
-			return '#f59e0b'
-		case PollutionStatus.CLEANED:
-			return '#10b981'
-		case PollutionStatus.VERIFIED:
-			return '#3b82f6'
-		default:
-			return '#6b7280'
-	}
-}
-
-const getMarkerIcon = (type: PollutionType): string => {
-	switch (type) {
-		case PollutionType.TRASH:
-			return '🗑️'
-		case PollutionType.OIL_SPILL:
-			return '🛢️'
-		case PollutionType.INDUSTRIAL_WASTE:
-			return '🏭'
-		case PollutionType.SEWAGE:
-			return '💧'
-		case PollutionType.PLASTIC:
-			return '♻️'
-		default:
-			return '⚠️'
-	}
+  point: PollutionPoint
+  onClick: (point: PollutionPoint) => void
 }
 
 export function PollutionMarker({point, onClick}: PollutionMarkerProps) {

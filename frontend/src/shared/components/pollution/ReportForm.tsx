@@ -1,63 +1,55 @@
-import {Button} from '@/shared/components/ui/Button'
-import {Input} from '@/shared/components/ui/Input'
-import {Label} from '@/shared/components/ui/Label'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { reportPollutionSchema, ReportPollutionFormData } from '@/shared/schemas/pollution.schema'
+import { Button } from '@/shared/components/ui/Button'
+import { Input } from '@/shared/components/ui/Input'
+import { Label } from '@/shared/components/ui/Label'
+import { Textarea } from '@/shared/components/ui/Textarea'
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/shared/components/ui/Select'
-import {Textarea} from '@/shared/components/ui/Textarea'
+import { PollutionType } from '@/shared/types'
+import { Upload } from 'lucide-react'
 import styles from '@/shared/styles/form.module.css'
-import {PollutionType} from '@/shared/types'
-import {zodResolver} from '@hookform/resolvers/zod'
-import {Upload} from 'lucide-react'
-import {useState} from 'react'
-import {useForm} from 'react-hook-form'
-import * as z from 'zod'
-
-const schema = z.object({
-	type: z.nativeEnum(PollutionType),
-	description: z.string().min(10, 'Description must be at least 10 characters'),
-	region: z.string().optional(),
-})
-
-type FormData = z.infer<typeof schema>
 
 interface ReportFormProps {
-	latitude: number
-	longitude: number
-	onSubmit: (data: FormData & {photos: File[]}) => void
-	isLoading?: boolean
+  latitude: number
+  longitude: number
+  onSubmit: (data: ReportPollutionFormData & { photos: File[] }) => void
+  isLoading?: boolean
 }
 
 export function ReportForm({
-	latitude,
-	longitude,
-	onSubmit,
-	isLoading,
+  latitude,
+  longitude,
+  onSubmit,
+  isLoading,
 }: ReportFormProps) {
-	const [photos, setPhotos] = useState<File[]>([])
+  const [photos, setPhotos] = useState<File[]>([])
 
-	const {
-		register,
-		handleSubmit,
-		formState: {errors},
-		setValue,
-	} = useForm<FormData>({
-		resolver: zodResolver(schema),
-	})
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<ReportPollutionFormData>({
+    resolver: zodResolver(reportPollutionSchema),
+  })
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (e.target.files) {
-			setPhotos(Array.from(e.target.files))
-		}
-	}
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setPhotos(Array.from(e.target.files))
+    }
+  }
 
-	const onFormSubmit = (data: FormData) => {
-		onSubmit({...data, photos})
-	}
+  const onFormSubmit = (data: ReportPollutionFormData) => {
+    onSubmit({ ...data, photos })
+  }
 
 	return (
 		<form onSubmit={handleSubmit(onFormSubmit)} className='space-y-4'>

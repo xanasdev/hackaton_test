@@ -24,7 +24,7 @@ export function Header() {
         </Link>
 
         <nav className={styles.nav}>
-          {isAuthenticated ? (
+          {!isAuthenticated ? (
             <>
               <Link href="/dashboard">
                 <Button variant="ghost">Dashboard</Button>
