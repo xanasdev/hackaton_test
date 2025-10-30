@@ -1,3 +1,11 @@
+'use client'
+
+import {Button} from '@/shared/components/ui/Button'
+
 export default function Home() {
-	return <div>test</div>
+	return (
+		<main>
+			<Button>TEST</Button>
+		</main>
+	)
 }
