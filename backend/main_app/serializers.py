@@ -33,6 +33,8 @@ class MarkerSerializer(serializers.ModelSerializer):
             "pollution_type_name",
             "photos",
             "created_at",
+            "creator",
+            "creator_username",
         )
         read_only_fields = ("id", "created_at")
 
