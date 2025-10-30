@@ -13,12 +13,23 @@ export const useAuth = () => {
       // Check token before making request
       const hasToken = !!Cookies.get('access_token')
       if (!hasToken) {
-        throw new Error('No token')
+        return null
       }
-      return authService.getCurrentUser()
+      try {
+        return await authService.getCurrentUser()
+      } catch (error) {
+        // If auth fails, clear token and return null
+        Cookies.remove('access_token')
+        Cookies.remove('refresh_token')
+        return null
+      }
     },
     retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: Infinity, // Never refetch automatically
+    gcTime: Infinity, // Keep in cache forever
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   })
 
   const loginMutation = useMutation({

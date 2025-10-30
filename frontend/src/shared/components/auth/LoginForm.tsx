@@ -1,8 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, LoginFormData } from '@/shared/schemas/auth.schema'
-import { Button } from '@/shared/components/ui/Button'
-import { Input } from '@/shared/components/ui/Input'
 import { Label } from '@/shared/components/ui/Label'
 import styles from '@/shared/styles/form.module.css'
 
