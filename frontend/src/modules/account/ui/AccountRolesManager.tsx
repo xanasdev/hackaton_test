@@ -1,18 +1,44 @@
-import {useMemo, useState} from 'react'
-import {z} from 'zod'
-import {useForm} from 'react-hook-form'
-import {zodResolver} from '@hookform/resolvers/zod'
-import {useRoles, useCreateRole, useUpdateRole, useDeleteRole} from '@/modules/auth'
+import {
+	useCreateRole,
+	useDeleteRole,
+	useRoles,
+	useUpdateRole,
+} from '@/modules/auth'
 import {Role, RolePermission} from '@/modules/auth/domain/role.model'
-import {Card, CardHeader, CardTitle, CardDescription, CardContent} from '@/shared/components/ui/Card'
-import {Button} from '@/shared/components/ui/Button'
 import {Badge} from '@/shared/components/ui/Badge'
+import {Button} from '@/shared/components/ui/Button'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@/shared/components/ui/Card'
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/shared/components/ui/Dialog'
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from '@/shared/components/ui/Form'
 import {Input} from '@/shared/components/ui/Input'
 import {Textarea} from '@/shared/components/ui/Textarea'
-import {Form, FormField, FormItem, FormLabel, FormControl, FormMessage} from '@/shared/components/ui/Form'
-import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger} from '@/shared/components/ui/Dialog'
-import {toast} from 'sonner'
 import styles from '@/shared/styles/account-page.module.css'
+import {zodResolver} from '@hookform/resolvers/zod'
+import {useTranslations} from 'next-intl'
+import {useMemo, useState} from 'react'
+import {useForm} from 'react-hook-form'
+import {toast} from 'sonner'
+import {z} from 'zod'
 
 const roleSchema = z.object({
 	name: z.string().min(2, 'Введите название роли'),
@@ -41,6 +67,8 @@ const toPermissionArray = (value: Role['permissions']): RolePermission[] => {
 }
 
 export const AccountRolesManager = ({canManage}: AccountRolesManagerProps) => {
+	const t = useTranslations('admin.roles')
+	const tCommon = useTranslations('common')
 	const {data: roles = [], isLoading, isError} = useRoles({enabled: canManage})
 	const createRole = useCreateRole()
 	const updateRole = useUpdateRole()
@@ -126,18 +154,21 @@ export const AccountRolesManager = ({canManage}: AccountRolesManagerProps) => {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle className={styles.sectionTitle}>Роли</CardTitle>
-				<CardDescription>Создавайте и редактируйте роли для управления доступом.</CardDescription>
+				<CardTitle className={styles.sectionTitle}>{t('title')}</CardTitle>
+				<CardDescription>{t('description')}</CardDescription>
 			</CardHeader>
 			<CardContent className={styles.adminSection}>
 				<Form {...createForm}>
-					<form onSubmit={createForm.handleSubmit(onCreate)} className={styles.cardContent}>
+					<form
+						onSubmit={createForm.handleSubmit(onCreate)}
+						className={styles.cardContent}
+					>
 						<FormField
 							control={createForm.control}
 							name='name'
 							render={({field}) => (
 								<FormItem>
-									<FormLabel>Название роли</FormLabel>
+									<FormLabel>{t('name')}</FormLabel>
 									<FormControl>
 										<Input placeholder='Например, ADMIN' {...field} />
 									</FormControl>
@@ -150,9 +181,12 @@ export const AccountRolesManager = ({canManage}: AccountRolesManagerProps) => {
 							name='description'
 							render={({field}) => (
 								<FormItem>
-									<FormLabel>Описание</FormLabel>
+									<FormLabel>{t('descriptionInput')}</FormLabel>
 									<FormControl>
-										<Textarea placeholder='Для чего предназначена роль' {...field} />
+										<Textarea
+											placeholder='Для чего предназначена роль'
+											{...field}
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -163,110 +197,154 @@ export const AccountRolesManager = ({canManage}: AccountRolesManagerProps) => {
 							name='permissions'
 							render={({field}) => (
 								<FormItem>
-									<FormLabel>Права</FormLabel>
+									<FormLabel>{t('permissions')}</FormLabel>
 									<FormControl>
-										<Input placeholder='admin_access, manager_access' {...field} />
+										<Input
+											placeholder='admin_access, manager_access'
+											{...field}
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
 							)}
 						/>
-						<Button type='submit' disabled={createRole.isPending}>Создать роль</Button>
+						<Button type='submit' disabled={createRole.isPending}>
+							{t('create')}
+						</Button>
 					</form>
 				</Form>
 
 				<div className={styles.roleList}>
-					{isLoading && <p className='text-sm text-muted-foreground'>Загрузка ролей...</p>}
-					{isError && <p className='text-sm text-destructive'>Нет доступа к списку ролей.</p>}
+					{isLoading && (
+						<p className='text-sm text-muted-foreground'>
+							{tCommon('loading')}
+						</p>
+					)}
+					{isError && (
+						<p className='text-sm text-destructive'>
+							Нет доступа к списку ролей.
+						</p>
+					)}
 					{!isLoading && !isError && sortedRoles.length === 0 && (
-						<p className='text-sm text-muted-foreground'>Роли еще не созданы.</p>
+						<p className='text-sm text-muted-foreground'>{t('empty')}</p>
 					)}
 					{!isError &&
 						sortedRoles.map((role) => {
 							const permissionList = toPermissionArray(role.permissions)
 							return (
-						<div key={role.id} className={styles.roleItem}>
-							<div>
-								<p className='text-sm font-semibold uppercase tracking-wide'>{role.name}</p>
-								<p className='text-sm text-muted-foreground'>{role.description || 'Без описания'}</p>
-							</div>
-							<div className={styles.roleActions}>
-								{permissionList.length === 0 && (
-									<Badge variant='outline'>Права не назначены</Badge>
-								)}
-								{permissionList.map((perm) => (
-									<Badge key={perm} variant='outline'>
-										{perm}
-									</Badge>
-								))}
-							</div>
-							<div className='flex gap-2'>
-								<Dialog open={editingRole?.id === role.id} onOpenChange={(open) => (!open ? setEditingRole(null) : openEdit(role))}>
-									<DialogTrigger asChild>
-										<Button variant='outline' size='sm' onClick={() => openEdit(role)}>
-											Изменить
+								<div key={role.id} className={styles.roleItem}>
+									<div>
+										<p className='text-sm font-semibold uppercase tracking-wide'>
+											{role.name}
+										</p>
+										<p className='text-sm text-muted-foreground'>
+											{role.description || 'Без описания'}
+										</p>
+									</div>
+									<div className={styles.roleActions}>
+										{permissionList.length === 0 && (
+											<Badge variant='outline'>Права не назначены</Badge>
+										)}
+										{permissionList.map((perm) => (
+											<Badge key={perm} variant='outline'>
+												{perm}
+											</Badge>
+										))}
+									</div>
+									<div className='flex gap-2'>
+										<Dialog
+											open={editingRole?.id === role.id}
+											onOpenChange={(open) =>
+												!open ? setEditingRole(null) : openEdit(role)
+											}
+										>
+											<DialogTrigger asChild>
+												<Button
+													variant='outline'
+													size='sm'
+													onClick={() => openEdit(role)}
+												>
+													{tCommon('edit')}
+												</Button>
+											</DialogTrigger>
+											<DialogContent>
+												<DialogHeader>
+													<DialogTitle>Редактирование роли</DialogTitle>
+												</DialogHeader>
+												<Form {...editForm}>
+													<form
+														onSubmit={editForm.handleSubmit(onUpdate)}
+														className='space-y-4'
+													>
+														<FormField
+															control={editForm.control}
+															name='name'
+															render={({field}) => (
+																<FormItem>
+																	<FormLabel>{t('name')}</FormLabel>
+																	<FormControl>
+																		<Input {...field} />
+																	</FormControl>
+																</FormItem>
+															)}
+														/>
+														<FormField
+															control={editForm.control}
+															name='description'
+															render={({field}) => (
+																<FormItem>
+																	<FormLabel>{t('descriptionInput')}</FormLabel>
+																	<FormControl>
+																		<Textarea {...field} />
+																	</FormControl>
+																</FormItem>
+															)}
+														/>
+														<FormField
+															control={editForm.control}
+															name='permissions'
+															render={({field}) => (
+																<FormItem>
+																	<FormLabel>{t('permissions')}</FormLabel>
+																	<FormControl>
+																		<Input
+																			placeholder='admin_access, manager_access'
+																			{...field}
+																		/>
+																	</FormControl>
+																</FormItem>
+															)}
+														/>
+														<DialogFooter className='flex justify-end gap-2'>
+															<Button
+																type='button'
+																variant='outline'
+																onClick={() => setEditingRole(null)}
+															>
+																{tCommon('cancel')}
+															</Button>
+															<Button
+																type='submit'
+																disabled={updateRole.isPending}
+															>
+																{tCommon('save')}
+															</Button>
+														</DialogFooter>
+													</form>
+												</Form>
+											</DialogContent>
+										</Dialog>
+										<Button
+											variant='destructive'
+											size='sm'
+											onClick={() => onDelete(role)}
+											disabled={deleteRole.isPending}
+										>
+											{tCommon('delete')}
 										</Button>
-									</DialogTrigger>
-									<DialogContent>
-										<DialogHeader>
-											<DialogTitle>Редактирование роли</DialogTitle>
-										</DialogHeader>
-										<Form {...editForm}>
-											<form onSubmit={editForm.handleSubmit(onUpdate)} className='space-y-4'>
-												<FormField
-													control={editForm.control}
-													name='name'
-													render={({field}) => (
-														<FormItem>
-															<FormLabel>Название</FormLabel>
-															<FormControl>
-																<Input {...field} />
-															</FormControl>
-														</FormItem>
-													)}
-												/>
-												<FormField
-													control={editForm.control}
-													name='description'
-													render={({field}) => (
-														<FormItem>
-															<FormLabel>Описание</FormLabel>
-															<FormControl>
-																<Textarea {...field} />
-															</FormControl>
-														</FormItem>
-													)}
-												/>
-												<FormField
-													control={editForm.control}
-													name='permissions'
-													render={({field}) => (
-														<FormItem>
-															<FormLabel>Права</FormLabel>
-															<FormControl>
-																<Input placeholder='admin_access, manager_access' {...field} />
-															</FormControl>
-														</FormItem>
-													)}
-												/>
-												<DialogFooter className='flex justify-end gap-2'>
-													<Button type='button' variant='outline' onClick={() => setEditingRole(null)}>
-														Отмена
-													</Button>
-													<Button type='submit' disabled={updateRole.isPending}>
-														Сохранить
-													</Button>
-												</DialogFooter>
-											</form>
-										</Form>
-									</DialogContent>
-								</Dialog>
-								<Button variant='destructive' size='sm' onClick={() => onDelete(role)} disabled={deleteRole.isPending}>
-									Удалить
-								</Button>
-							</div>
-						</div>
-						)
+									</div>
+								</div>
+							)
 						})}
 				</div>
 			</CardContent>

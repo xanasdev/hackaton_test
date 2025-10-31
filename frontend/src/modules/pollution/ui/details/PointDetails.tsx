@@ -1,10 +1,11 @@
 import {UserRole} from '@/modules/auth'
 import {Button} from '@/shared/components/ui/Button'
-import {Clock, MapPin, Trash2} from 'lucide-react'
 import {Card} from '@/shared/components/ui/Card'
+import {Clock, MapPin, Trash2} from 'lucide-react'
+import {useTranslations} from 'next-intl'
 import {Marker, PollutionStatus} from '../../domain/pollution.model'
-import {PointDetailsHeader} from './PointDetailsHeader'
 import {PointDetailsDescription} from './PointDetailsDescription'
+import {PointDetailsHeader} from './PointDetailsHeader'
 import {PointDetailsMeta} from './PointDetailsMeta'
 
 interface PointDetailsProps {
@@ -14,7 +15,13 @@ interface PointDetailsProps {
 	onDelete?: () => void
 }
 
-export const PointDetails = ({marker, userRole, onStatusChange, onDelete}: PointDetailsProps) => {
+export const PointDetails = ({
+	marker,
+	userRole,
+	onStatusChange,
+	onDelete,
+}: PointDetailsProps) => {
+	const t = useTranslations('home.details')
 	const canManage =
 		userRole === UserRole.ACTIVIST || userRole === UserRole.ADMIN
 
@@ -27,7 +34,7 @@ export const PointDetails = ({marker, userRole, onStatusChange, onDelete}: Point
 			{canManage && (
 				<section className='space-y-3 border-t border-border pt-4'>
 					<h4 className='text-sm font-semibold uppercase tracking-wide text-muted-foreground'>
-						Действия
+						{t('actionsTitle')}
 					</h4>
 					<div className='flex flex-wrap gap-2'>
 						{marker.status !== PollutionStatus.IN_PROGRESS &&
@@ -38,7 +45,7 @@ export const PointDetails = ({marker, userRole, onStatusChange, onDelete}: Point
 									onClick={() => onStatusChange(PollutionStatus.IN_PROGRESS)}
 								>
 									<Clock className='mr-2 h-4 w-4' />
-									Перевести в работу
+									{t('setInProgress')}
 								</Button>
 							)}
 						{marker.status !== PollutionStatus.CLEANED && onStatusChange && (
@@ -48,13 +55,13 @@ export const PointDetails = ({marker, userRole, onStatusChange, onDelete}: Point
 								onClick={() => onStatusChange(PollutionStatus.CLEANED)}
 							>
 								<MapPin className='mr-2 h-4 w-4' />
-								Отметить очищенной
+								{t('markCleaned')}
 							</Button>
 						)}
 						{userRole === UserRole.ADMIN && onDelete && (
 							<Button variant='destructive' size='sm' onClick={onDelete}>
 								<Trash2 className='mr-2 h-4 w-4' />
-								Удалить
+								{t('delete')}
 							</Button>
 						)}
 					</div>

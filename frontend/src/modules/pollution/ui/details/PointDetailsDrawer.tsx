@@ -1,6 +1,13 @@
-import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle} from '@/shared/components/ui/Sheet'
-import {Marker, PollutionStatus} from '../../domain/pollution.model'
 import {UserRole} from '@/modules/auth'
+import {
+	Sheet,
+	SheetContent,
+	SheetDescription,
+	SheetHeader,
+	SheetTitle,
+} from '@/shared/components/ui/Sheet'
+import {useTranslations} from 'next-intl'
+import {Marker, PollutionStatus} from '../../domain/pollution.model'
 import {PointDetails} from './PointDetails'
 
 interface PointDetailsDrawerProps {
@@ -11,16 +18,31 @@ interface PointDetailsDrawerProps {
 	onDelete: () => void
 }
 
-export const PointDetailsDrawer = ({marker, userRole, onClose, onStatusChange, onDelete}: PointDetailsDrawerProps) => (
-	<Sheet open={!!marker} onOpenChange={() => onClose()}>
-		<SheetContent>
-			<SheetHeader>
-				<SheetTitle>Pollution Details</SheetTitle>
-				<SheetDescription>Информация о выбранной точке загрязнения</SheetDescription>
-			</SheetHeader>
-			{marker && (
-				<PointDetails marker={marker} userRole={userRole} onStatusChange={onStatusChange} onDelete={onDelete} />
-			)}
-		</SheetContent>
-	</Sheet>
-)
+export const PointDetailsDrawer = ({
+	marker,
+	userRole,
+	onClose,
+	onStatusChange,
+	onDelete,
+}: PointDetailsDrawerProps) => {
+	const t = useTranslations('home.details')
+
+	return (
+		<Sheet open={!!marker} onOpenChange={() => onClose()}>
+			<SheetContent>
+				<SheetHeader>
+					<SheetTitle>{t('drawerTitle')}</SheetTitle>
+					<SheetDescription>{t('drawerDescription')}</SheetDescription>
+				</SheetHeader>
+				{marker && (
+					<PointDetails
+						marker={marker}
+						userRole={userRole}
+						onStatusChange={onStatusChange}
+						onDelete={onDelete}
+					/>
+				)}
+			</SheetContent>
+		</Sheet>
+	)
+}
