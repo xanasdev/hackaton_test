@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Marker, MarkerPhoto, PollutionType
+from .models import Marker, MarkerPhoto, PollutionType, MarkerComment
 
 
 @admin.register(PollutionType)
@@ -29,3 +29,11 @@ class MarkerPhotoAdmin(admin.ModelAdmin):
     search_fields = ("image", "marker__region_type")
     list_filter = ("uploaded_at",)
     raw_id_fields = ("marker",)
+
+
+@admin.register(MarkerComment)
+class MarkerCommentAdmin(admin.ModelAdmin):
+    list_display = ("marker", "creator", "created_at")
+    search_fields = ("message", "creator__username")
+    list_filter = ("created_at",)
+    raw_id_fields = ("marker", "creator")
