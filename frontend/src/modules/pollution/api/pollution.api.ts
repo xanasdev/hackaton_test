@@ -33,7 +33,15 @@ const buildCreateFormData = (payload: CreateMarkerPayload) => {
 
 export const pollutionApi = {
 	async getAll(params?: MarkerFilters): Promise<Marker[]> {
-		const {data} = await httpClient.get<Marker[]>(PollutionEndpoints.markers, {params})
+		const query: Record<string, unknown> = {}
+		if (params?.pollution_type) query.pollution_type = params.pollution_type
+		if (params?.region_type) query.region_type = params.region_type
+		if (params?.search) query.search = params.search
+		if (params?.status) query.status = params.status
+		if (params?.type) query.pollution_type_name = params.type
+		const {data} = await httpClient.get<Marker[]>(PollutionEndpoints.markers, {
+			params: Object.keys(query).length ? query : undefined,
+		})
 		return data
 	},
 

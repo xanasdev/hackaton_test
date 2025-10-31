@@ -8,9 +8,9 @@ import {PollutionStatus, PollutionType} from '../../domain/pollution.model'
 
 interface FilterPanelProps {
 	status?: PollutionStatus
-	type?: PollutionType
+	type?: PollutionType | string
 	onStatusChange: (status?: PollutionStatus) => void
-	onTypeChange: (type?: PollutionType) => void
+	onTypeChange: (type?: PollutionType | string) => void
 	onReset: () => void
 }
 
@@ -42,13 +42,13 @@ export const FilterPanel = ({status, type, onStatusChange, onTypeChange, onReset
 						<span className='text-sm font-semibold'>Active Filters:</span>
 						{status && (
 							<Badge variant='default' className={styles.filterBadge}>
-								{STATUS_LABELS[status]}
+								{STATUS_LABELS[status] ?? status}
 								<X className='h-3 w-3 cursor-pointer' onClick={() => onStatusChange(undefined)} />
 							</Badge>
 						)}
 						{type && (
 							<Badge variant='default' className={styles.filterBadge}>
-								{TYPE_LABELS[type]}
+								{TYPE_LABELS[type as PollutionType] ?? type}
 								<X className='h-3 w-3 cursor-pointer' onClick={() => onTypeChange(undefined)} />
 							</Badge>
 						)}
@@ -59,7 +59,7 @@ export const FilterPanel = ({status, type, onStatusChange, onTypeChange, onReset
 			<div className={styles.filterSection}>
 				<Label className={styles.filterLabel}>Filter by Status</Label>
 				<p className={styles.filterDescription}>Show pollution points by their current status</p>
-				<Select value={status} onValueChange={(value) => onStatusChange(value === 'all' ? undefined : (value as PollutionStatus))}>
+				<Select value={status ?? 'all'} onValueChange={(value) => onStatusChange(value === 'all' ? undefined : (value as PollutionStatus))}>
 					<SelectTrigger>
 						<SelectValue placeholder='All statuses' />
 					</SelectTrigger>
@@ -76,7 +76,7 @@ export const FilterPanel = ({status, type, onStatusChange, onTypeChange, onReset
 			<div className={styles.filterSection}>
 				<Label className={styles.filterLabel}>Filter by Type</Label>
 				<p className={styles.filterDescription}>Show pollution points by type of contamination</p>
-				<Select value={type} onValueChange={(value) => onTypeChange(value === 'all' ? undefined : (value as PollutionType))}>
+				<Select value={type ?? 'all'} onValueChange={(value) => onTypeChange(value === 'all' ? undefined : (value as PollutionType))}>
 					<SelectTrigger>
 						<SelectValue placeholder='All types' />
 					</SelectTrigger>

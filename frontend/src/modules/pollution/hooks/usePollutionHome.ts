@@ -4,6 +4,7 @@ import {useGeolocation} from '@/shared/hooks/use-geolocation'
 import {extractCoordinates} from '@/shared/utils/map.utils'
 import {YandexMapEvent} from '@/shared/interfaces/map.interface'
 import {findNearbyMarkers} from '../utils/distance'
+import {buildPollutionStats} from '../utils/stats'
 import {ReportPollutionFormData} from '../schemas/report.schema'
 import {Marker, PollutionStatus} from '../domain/pollution.model'
 import {usePollution} from './usePollution'
@@ -29,7 +30,13 @@ export const usePollutionHome = () => {
 		setFilters,
 	} = usePollutionState()
 
-	const {markers, stats, createMarker, deleteMarker, updateMarker, isCreating} = usePollution(filters)
+	const {
+		markers: allMarkers,
+		createMarker,
+		deleteMarker,
+		updateMarker,
+		isCreating,
+	} = usePollution()
 
 	const {submitReport, deleteReport, changeStatus} = usePollutionActions({
 		createMarker,
@@ -37,10 +44,23 @@ export const usePollutionHome = () => {
 		updateMarker,
 	})
 
+	const filteredMarkers = useMemo(() => {
+		let next = allMarkers
+		if (filters.status) {
+			next = next.filter((marker) => (marker.status ?? PollutionStatus.REPORTED) === filters.status)
+		}
+		if (filters.type) {
+			next = next.filter((marker) => marker.pollution_type.name === filters.type)
+		}
+		return next
+	}, [allMarkers, filters.status, filters.type])
+
+	const filteredStats = useMemo(() => buildPollutionStats(filteredMarkers), [filteredMarkers])
+
 	const nearbyMarkers = useMemo(() => {
 		if (!location.latitude || !location.longitude) return []
-		return findNearbyMarkers(location.latitude, location.longitude, markers, 50)
-	}, [location.latitude, location.longitude, markers])
+		return findNearbyMarkers(location.latitude, location.longitude, filteredMarkers, 50)
+	}, [location.latitude, location.longitude, filteredMarkers])
 
 	const overlaysOpen = reportDialogOpen || filtersSheetOpen || !!selectedMarker
 	const showNearby = nearbyMarkers.length > 0 && !nearbyDismissed && !nearbyAutoHidden && !!location.latitude
@@ -133,8 +153,8 @@ export const usePollutionHome = () => {
 	return {
 		userRole,
 		location,
-		markers,
-		stats,
+		markers: filteredMarkers,
+		stats: filteredStats,
 		nearbyMarkers,
 		showNearby,
 		reportDialogOpen,
