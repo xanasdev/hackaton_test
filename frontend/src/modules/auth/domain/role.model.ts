@@ -8,13 +8,13 @@ export interface Role {
 	id: number
 	name: string
 	description: string
-	permissions: RolePermission[]
+	permissions: RolePermission[] | string | null
 }
 
 export interface CreateRolePayload {
 	name: string
 	description?: string
-	permissions: RolePermission[]
+	permissions: RolePermission[] | string
 }
 
 export type UpdateRolePayload = Partial<CreateRolePayload>

@@ -1,7 +1,9 @@
+import {useState} from 'react'
 import Image from 'next/image'
-import {Camera, Clock} from 'lucide-react'
+import {Camera, Clock, X} from 'lucide-react'
 import {Badge} from '@/shared/components/ui/Badge'
 import {getMediaUrl} from '@/shared/utils/media'
+import styles from './point-details.module.css'
 import {Marker, PollutionStatus} from '../../domain/pollution.model'
 
 const statusStyles: Record<PollutionStatus, string> = {
@@ -19,6 +21,7 @@ export const PointDetailsHeader = ({marker}: PointDetailsHeaderProps) => {
 	const photos = marker.photos ?? []
 	const featuredPhoto = photos[0]
 	const featuredPhotoUrl = getMediaUrl(featuredPhoto?.image)
+const [lightboxOpen, setLightboxOpen] = useState(false)
 
 	return (
 		<header className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
@@ -39,7 +42,11 @@ export const PointDetailsHeader = ({marker}: PointDetailsHeaderProps) => {
 			</div>
 			{featuredPhotoUrl ? (
 				<div className='flex gap-2'>
-					<div className='overflow-hidden rounded-lg border border-border bg-muted/40 p-1'>
+					<button
+						type='button'
+						onClick={() => setLightboxOpen(true)}
+						className='overflow-hidden rounded-lg border border-border bg-muted/40 p-1 transition hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+					>
 						<Image
 							src={featuredPhotoUrl}
 							alt='Фото загрязнения'
@@ -48,7 +55,7 @@ export const PointDetailsHeader = ({marker}: PointDetailsHeaderProps) => {
 							className='h-32 w-32 rounded-md object-cover'
 							priority
 						/>
-					</div>
+					</button>
 					{photos.length > 1 && (
 						<div className='flex flex-col justify-between rounded-lg border border-dashed border-border/70 bg-muted/10 p-3 text-xs text-muted-foreground'>
 							<span className='inline-flex items-center gap-2 font-medium'>
@@ -60,6 +67,22 @@ export const PointDetailsHeader = ({marker}: PointDetailsHeaderProps) => {
 					)}
 				</div>
 			) : null}
+			{lightboxOpen && featuredPhotoUrl && (
+				<div className={styles.lightboxOverlay} role='dialog' aria-modal='true'>
+					<div className='relative'>
+						<button
+							type='button'
+							onClick={() => setLightboxOpen(false)}
+							className='absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white transition hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/20'
+						>
+							<X className='h-4 w-4' />
+						</button>
+						<div className={styles.lightboxContent}>
+							<Image src={featuredPhotoUrl} alt='Просмотр фотографии загрязнения' width={960} height={640} className='h-full w-full object-contain bg-black' />
+						</div>
+					</div>
+				</div>
+			)}
 		</header>
 	)
 }

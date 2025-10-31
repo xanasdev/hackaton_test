@@ -72,5 +72,6 @@ export interface UpdateMarkerPayload {
 	description?: string
 	region_type?: string
 	pollution_type_name?: PollutionType | string
+	status?: PollutionStatus
 	photos?: File[]
 }

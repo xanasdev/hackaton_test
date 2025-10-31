@@ -1,4 +1,4 @@
-import {useCallback, useMemo, useState} from 'react'
+import {useCallback, useEffect, useMemo, useState} from 'react'
 import {useAuth, UserRole} from '@/modules/auth'
 import {useGeolocation} from '@/shared/hooks/use-geolocation'
 import {extractCoordinates} from '@/shared/utils/map.utils'
@@ -13,6 +13,7 @@ import {usePollutionState} from './usePollutionState'
 export const usePollutionHome = () => {
 	const {user} = useAuth()
 	const [nearbyDismissed, setNearbyDismissed] = useState(false)
+	const [nearbyAutoHidden, setNearbyAutoHidden] = useState(false)
 	const location = useGeolocation()
 
 	const {
@@ -28,11 +29,12 @@ export const usePollutionHome = () => {
 		setFilters,
 	} = usePollutionState()
 
-	const {markers, stats, createMarker, deleteMarker, isCreating} = usePollution(filters)
+	const {markers, stats, createMarker, deleteMarker, updateMarker, isCreating} = usePollution(filters)
 
 	const {submitReport, deleteReport, changeStatus} = usePollutionActions({
 		createMarker,
 		deleteMarker,
+		updateMarker,
 	})
 
 	const nearbyMarkers = useMemo(() => {
@@ -40,7 +42,12 @@ export const usePollutionHome = () => {
 		return findNearbyMarkers(location.latitude, location.longitude, markers, 50)
 	}, [location.latitude, location.longitude, markers])
 
-	const showNearby = nearbyMarkers.length > 0 && !nearbyDismissed && !!location.latitude
+	const overlaysOpen = reportDialogOpen || filtersSheetOpen || !!selectedMarker
+	const showNearby = nearbyMarkers.length > 0 && !nearbyDismissed && !nearbyAutoHidden && !!location.latitude
+
+	useEffect(() => {
+		setNearbyAutoHidden(overlaysOpen)
+	}, [overlaysOpen])
 
 	const handleMapClick = useCallback(
 		(event: YandexMapEvent) => {
@@ -81,9 +88,11 @@ export const usePollutionHome = () => {
 
 	const handleStatusChange = useCallback(
 		(status: PollutionStatus) => {
-			changeStatus(status)
+			changeStatus(selectedMarker, status, {
+				onSuccess: () => setSelectedMarker(null),
+			})
 		},
-		[changeStatus],
+		[changeStatus, selectedMarker, setSelectedMarker],
 	)
 
 	const handleDetailsClose = useCallback(() => setSelectedMarker(null), [setSelectedMarker])
@@ -113,7 +122,10 @@ export const usePollutionHome = () => {
 
 	const openReportDialog = useCallback(() => setReportDialogOpen(true), [setReportDialogOpen])
 	const openFilterDrawer = useCallback(() => setFiltersSheetOpen(true), [setFiltersSheetOpen])
-	const dismissNearby = useCallback(() => setNearbyDismissed(true), [])
+	const dismissNearby = useCallback(() => {
+		setNearbyDismissed(true)
+		setNearbyAutoHidden(false)
+	}, [])
 	const selectMarker = useCallback((marker: Marker | null) => setSelectedMarker(marker), [setSelectedMarker])
 
 	const userRole = user?.role_name as UserRole | undefined

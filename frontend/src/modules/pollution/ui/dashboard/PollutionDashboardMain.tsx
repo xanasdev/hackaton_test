@@ -4,7 +4,7 @@ import {DashboardSidebar} from '@/modules/layout/DashboardSidebar'
 import {MapWrapper} from '../map/MapWrapper'
 import {YandexMapView} from '../map/YandexMapView'
 import {MapMarkersList} from '../map/MapMarkersList'
-import {NearbyDangerList} from '../nearby/NearbyDangerList'
+import {NearbyPanel} from '../nearby/NearbyPanel'
 import {Marker, PollutionStats} from '../../domain/pollution.model'
 import {NearbyMarker} from '../../utils/distance'
 import {YandexMapEvent} from '@/shared/interfaces/map.interface'
@@ -56,12 +56,12 @@ export const PollutionDashboardMain = ({
 			}
 			map={
 				<MapWrapper>
-					<YandexMapView onMapClick={onMapClick}>
+					<YandexMapView onMapClick={onMapClick} markers={markers}>
 						<MapMarkersList markers={markers} onMarkerClick={onMarkerSelect} />
 					</YandexMapView>
 
 					{showNearby && hasLocation && (
-						<NearbyDangerList
+						<NearbyPanel
 							markers={nearbyMarkers}
 							userLocation={{latitude, longitude}}
 							onMarkerClick={onMarkerSelect}

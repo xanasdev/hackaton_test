@@ -13,6 +13,7 @@ type UsePollutionReturn = ReturnType<typeof import('./usePollution').usePollutio
 interface PollutionActionDeps {
 	createMarker: UsePollutionReturn['createMarker']
 	deleteMarker: UsePollutionReturn['deleteMarker']
+	updateMarker: UsePollutionReturn['updateMarker']
 }
 
 interface ActionCallbacks {
@@ -21,7 +22,7 @@ interface ActionCallbacks {
 }
 
 
-export const usePollutionActions = ({createMarker, deleteMarker}: PollutionActionDeps) => {
+export const usePollutionActions = ({createMarker, deleteMarker, updateMarker}: PollutionActionDeps) => {
 	const submitReport = async (
 		coordinates: [number, number] | null,
 		data: ReportPayload,
@@ -64,13 +65,25 @@ export const usePollutionActions = ({createMarker, deleteMarker}: PollutionActio
 		})
 	}
 
-	const changeStatus = (status?: PollutionStatus) => {
-    if (status) {
-        toast.info(`Смена статуса ${status} пока не поддерживается`)
-        return
-    }
-    toast.info('Смена статуса пока не поддерживается')
-}
+	const changeStatus = (marker: Marker | null, status: PollutionStatus, callbacks?: ActionCallbacks) => {
+		if (!marker) return
+		updateMarker(
+			{
+				id: marker.id,
+				payload: {status},
+			},
+			{
+				onSuccess: () => {
+					toast.success('Статус метки обновлён')
+					callbacks?.onSuccess?.()
+				},
+				onError: () => {
+					toast.error('Не удалось обновить статус')
+					callbacks?.onError?.()
+				},
+			},
+		)
+	}
 
 	return {
 		submitReport,

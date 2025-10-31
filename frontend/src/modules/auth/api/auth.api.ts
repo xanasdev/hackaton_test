@@ -1,5 +1,13 @@
 import {httpClient} from '@/shared/api/http.client'
-import {AuthTokens, AuthUser, LoginCredentials, LoginResponse, RegisterPayload, RegisterResponse} from '../domain/auth.model'
+import {
+	AuthTokens,
+	AuthUser,
+	LoginCredentials,
+	LoginResponse,
+	RegisterPayload,
+	RegisterResponse,
+	UpdateUserPayload,
+} from '../domain/auth.model'
 import {tokenStorage} from '../utils/token.storage'
 
 const AuthEndpoints = {
@@ -7,7 +15,10 @@ const AuthEndpoints = {
 	register: '/auth/register/',
 	profile: '/auth/profile/',
 	refresh: '/auth/token/refresh/',
+	adminOnly: '/auth/admin-only/',
+	manager: '/auth/manager/',
 	users: '/auth/users/',
+	user: (id: number) => `/auth/users/${id}/`,
 } as const
 
 export const authApi = {
@@ -43,6 +54,35 @@ export const authApi = {
 
 	async getUsers(): Promise<AuthUser[]> {
 		const {data} = await httpClient.get<AuthUser[]>(AuthEndpoints.users)
+		return data
+	},
+
+	async getUserById(id: number): Promise<AuthUser> {
+		const {data} = await httpClient.get<AuthUser>(AuthEndpoints.user(id))
+		return data
+	},
+
+	async updateUser(id: number, payload: UpdateUserPayload): Promise<AuthUser> {
+		const {data} = await httpClient.put<AuthUser>(AuthEndpoints.user(id), payload)
+		return data
+	},
+
+	async patchUser(id: number, payload: Partial<UpdateUserPayload>): Promise<AuthUser> {
+		const {data} = await httpClient.patch<AuthUser>(AuthEndpoints.user(id), payload)
+		return data
+	},
+
+	async deleteUser(id: number): Promise<void> {
+		await httpClient.delete(AuthEndpoints.user(id))
+	},
+
+	async checkAdminAccess(): Promise<boolean> {
+		await httpClient.get(AuthEndpoints.adminOnly)
+		return true
+	},
+
+	async getManagerData<T = unknown>(): Promise<T> {
+		const {data} = await httpClient.get<T>(AuthEndpoints.manager)
 		return data
 	},
 }

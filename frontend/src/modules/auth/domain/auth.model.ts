@@ -31,6 +31,15 @@ export interface AuthUser {
 	avatar?: string
 }
 
+export interface UpdateUserPayload {
+	username?: string
+	email?: string
+	first_name?: string
+	last_name?: string
+	phone?: string
+	role?: number | null
+}
+
 export enum UserRole {
 	CITIZEN = 'CITIZEN',
 	ACTIVIST = 'ACTIVIST',

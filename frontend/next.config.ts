@@ -1,5 +1,8 @@
 import type {NextConfig} from 'next'
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? ''
+const isLocalMedia = apiUrl.includes('localhost') || apiUrl.includes('127.0.0.1')
+
 const nextConfig: NextConfig = {
 	reactCompiler: true,
 	images: {
@@ -11,6 +14,7 @@ const nextConfig: NextConfig = {
 				pathname: '/media/**',
 			},
 		],
+		unoptimized: isLocalMedia,
 	},
 }
 
