@@ -1,10 +1,9 @@
-import {PollutionStatus} from '../../domain/pollution.model'
-import {ReportPollutionFormData} from '../../schemas/report.schema'
-import {ReportPollutionDialog} from '../dialogs/ReportPollutionDialog'
-import {PointDetailsDrawer} from '../details/PointDetailsDrawer'
-import {FilterDrawer} from '../filter/FilterDrawer'
-import {Marker} from '../../domain/pollution.model'
 import {UserRole} from '@/modules/auth'
+import {Marker, PollutionStatus} from '../../domain/pollution.model'
+import {ReportPollutionFormData} from '../../schemas/report.schema'
+import {PointDetailsDrawer} from '../details/PointDetailsDrawer'
+import {ReportPollutionDialog} from '../dialogs/ReportPollutionDialog'
+import {FilterDrawer} from '../filter/FilterDrawer'
 
 interface FilterState {
 	status?: PollutionStatus
@@ -19,6 +18,7 @@ interface PollutionOverlaysProps {
 	isCreating: boolean
 	selectedMarker: Marker | null
 	userRole?: UserRole
+	userId?: number
 	onDetailsClose: () => void
 	onStatusChange: (status: PollutionStatus) => void
 	onDeleteMarker: () => void
@@ -38,6 +38,7 @@ export const PollutionOverlays = ({
 	isCreating,
 	selectedMarker,
 	userRole,
+	userId,
 	onDetailsClose,
 	onStatusChange,
 	onDeleteMarker,
@@ -56,15 +57,14 @@ export const PollutionOverlays = ({
 			onSubmit={onReportSubmit}
 			isLoading={isCreating}
 		/>
-
 		<PointDetailsDrawer
 			marker={selectedMarker}
 			userRole={userRole}
+			userId={userId}
 			onClose={onDetailsClose}
 			onStatusChange={onStatusChange}
 			onDelete={onDeleteMarker}
-		/>
-
+		/>{' '}
 		<FilterDrawer
 			open={filtersOpen}
 			onOpenChange={onFiltersOpenChange}

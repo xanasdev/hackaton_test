@@ -13,6 +13,7 @@ import {PointDetails} from './PointDetails'
 interface PointDetailsDrawerProps {
 	marker: Marker | null
 	userRole?: UserRole
+	userId?: number
 	onClose: () => void
 	onStatusChange: (status: PollutionStatus) => void
 	onDelete: () => void
@@ -21,6 +22,7 @@ interface PointDetailsDrawerProps {
 export const PointDetailsDrawer = ({
 	marker,
 	userRole,
+	userId,
 	onClose,
 	onStatusChange,
 	onDelete,
@@ -38,6 +40,7 @@ export const PointDetailsDrawer = ({
 					<PointDetails
 						marker={marker}
 						userRole={userRole}
+						userId={userId}
 						onStatusChange={onStatusChange}
 						onDelete={onDelete}
 					/>

@@ -11,6 +11,7 @@ import {PointDetailsMeta} from './PointDetailsMeta'
 interface PointDetailsProps {
 	marker: Marker
 	userRole?: UserRole
+	userId?: number
 	onStatusChange?: (status: PollutionStatus) => void
 	onDelete?: () => void
 }
@@ -18,12 +19,15 @@ interface PointDetailsProps {
 export const PointDetails = ({
 	marker,
 	userRole,
+	userId,
 	onStatusChange,
 	onDelete,
 }: PointDetailsProps) => {
 	const t = useTranslations('home.details')
 	const canManage =
 		userRole === UserRole.ACTIVIST || userRole === UserRole.ADMIN
+	const canDelete =
+		userRole === UserRole.ADMIN || (userId && marker.creator === userId)
 
 	return (
 		<Card className='space-y-6 p-6 shadow-sm'>
@@ -58,7 +62,7 @@ export const PointDetails = ({
 								{t('markCleaned')}
 							</Button>
 						)}
-						{userRole === UserRole.ADMIN && onDelete && (
+						{canDelete && onDelete && (
 							<Button variant='destructive' size='sm' onClick={onDelete}>
 								<Trash2 className='mr-2 h-4 w-4' />
 								{t('delete')}

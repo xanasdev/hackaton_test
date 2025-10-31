@@ -193,7 +193,8 @@
 			"createdAt": "Yaradılma tarixi",
 			"region": "Region",
 			"regionUnknown": "Göstərilməyib",
-			"coordinates": "Koordinatlar"
+			"coordinates": "Koordinatlar",
+			"descriptionTitle": "Təsvir"
 		}
 	}
 }

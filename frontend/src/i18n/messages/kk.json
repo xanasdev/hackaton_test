@@ -193,7 +193,8 @@
 			"createdAt": "Жасалған күні",
 			"region": "Аймақ",
 			"regionUnknown": "Көрсетілмеген",
-			"coordinates": "Координаттар"
+			"coordinates": "Координаттар",
+			"descriptionTitle": "Сипаттама"
 		}
 	}
 }

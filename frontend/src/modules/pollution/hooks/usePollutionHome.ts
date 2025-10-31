@@ -1,12 +1,12 @@
-import {useCallback, useEffect, useMemo, useState} from 'react'
 import {useAuth, UserRole} from '@/modules/auth'
 import {useGeolocation} from '@/shared/hooks/use-geolocation'
-import {extractCoordinates} from '@/shared/utils/map.utils'
 import {YandexMapEvent} from '@/shared/interfaces/map.interface'
+import {extractCoordinates} from '@/shared/utils/map.utils'
+import {useCallback, useEffect, useMemo, useState} from 'react'
+import {Marker, PollutionStatus} from '../domain/pollution.model'
+import {ReportPollutionFormData} from '../schemas/report.schema'
 import {findNearbyMarkers} from '../utils/distance'
 import {buildPollutionStats} from '../utils/stats'
-import {ReportPollutionFormData} from '../schemas/report.schema'
-import {Marker, PollutionStatus} from '../domain/pollution.model'
 import {usePollution} from './usePollution'
 import {usePollutionActions} from './usePollutionActions'
 import {usePollutionState} from './usePollutionState'
@@ -47,23 +47,40 @@ export const usePollutionHome = () => {
 	const filteredMarkers = useMemo(() => {
 		let next = allMarkers
 		if (filters.status) {
-			next = next.filter((marker) => (marker.status ?? PollutionStatus.REPORTED) === filters.status)
+			next = next.filter(
+				(marker) =>
+					(marker.status ?? PollutionStatus.REPORTED) === filters.status,
+			)
 		}
 		if (filters.type) {
-			next = next.filter((marker) => marker.pollution_type.name === filters.type)
+			next = next.filter(
+				(marker) => marker.pollution_type.name === filters.type,
+			)
 		}
 		return next
 	}, [allMarkers, filters.status, filters.type])
 
-	const filteredStats = useMemo(() => buildPollutionStats(filteredMarkers), [filteredMarkers])
+	const filteredStats = useMemo(
+		() => buildPollutionStats(filteredMarkers),
+		[filteredMarkers],
+	)
 
 	const nearbyMarkers = useMemo(() => {
 		if (!location.latitude || !location.longitude) return []
-		return findNearbyMarkers(location.latitude, location.longitude, filteredMarkers, 50)
+		return findNearbyMarkers(
+			location.latitude,
+			location.longitude,
+			filteredMarkers,
+			50,
+		)
 	}, [location.latitude, location.longitude, filteredMarkers])
 
 	const overlaysOpen = reportDialogOpen || filtersSheetOpen || !!selectedMarker
-	const showNearby = nearbyMarkers.length > 0 && !nearbyDismissed && !nearbyAutoHidden && !!location.latitude
+	const showNearby =
+		nearbyMarkers.length > 0 &&
+		!nearbyDismissed &&
+		!nearbyAutoHidden &&
+		!!location.latitude
 
 	useEffect(() => {
 		setNearbyAutoHidden(overlaysOpen)
@@ -115,7 +132,10 @@ export const usePollutionHome = () => {
 		[changeStatus, selectedMarker, setSelectedMarker],
 	)
 
-	const handleDetailsClose = useCallback(() => setSelectedMarker(null), [setSelectedMarker])
+	const handleDetailsClose = useCallback(
+		() => setSelectedMarker(null),
+		[setSelectedMarker],
+	)
 
 	const handleFilterDrawerChange = useCallback(
 		(open: boolean) => {
@@ -140,18 +160,29 @@ export const usePollutionHome = () => {
 
 	const handleFiltersReset = useCallback(() => setFilters({}), [setFilters])
 
-	const openReportDialog = useCallback(() => setReportDialogOpen(true), [setReportDialogOpen])
-	const openFilterDrawer = useCallback(() => setFiltersSheetOpen(true), [setFiltersSheetOpen])
+	const openReportDialog = useCallback(
+		() => setReportDialogOpen(true),
+		[setReportDialogOpen],
+	)
+	const openFilterDrawer = useCallback(
+		() => setFiltersSheetOpen(true),
+		[setFiltersSheetOpen],
+	)
 	const dismissNearby = useCallback(() => {
 		setNearbyDismissed(true)
 		setNearbyAutoHidden(false)
 	}, [])
-	const selectMarker = useCallback((marker: Marker | null) => setSelectedMarker(marker), [setSelectedMarker])
+	const selectMarker = useCallback(
+		(marker: Marker | null) => setSelectedMarker(marker),
+		[setSelectedMarker],
+	)
 
 	const userRole = user?.role_name as UserRole | undefined
+	const userId = user?.id
 
 	return {
 		userRole,
+		userId,
 		location,
 		markers: filteredMarkers,
 		stats: filteredStats,

@@ -1,12 +1,13 @@
 'use client'
 
+import {usePollutionHome} from '@/modules/pollution/hooks/usePollutionHome'
 import {PollutionDashboardMain} from '@/modules/pollution/ui/dashboard/PollutionDashboardMain'
 import {PollutionOverlays} from '@/modules/pollution/ui/dashboard/PollutionOverlays'
-import {usePollutionHome} from '@/modules/pollution/hooks/usePollutionHome'
 
 export default function HomePage() {
 	const {
 		userRole,
+		userId,
 		location,
 		markers,
 		stats,
@@ -57,6 +58,7 @@ export default function HomePage() {
 				isCreating={isCreating}
 				selectedMarker={selectedMarker}
 				userRole={userRole}
+				userId={userId}
 				onDetailsClose={handleDetailsClose}
 				onStatusChange={handleStatusChange}
 				onDeleteMarker={handleDeleteMarker}
