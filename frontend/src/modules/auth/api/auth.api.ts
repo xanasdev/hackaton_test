@@ -7,6 +7,7 @@ const AuthEndpoints = {
 	register: '/auth/register/',
 	profile: '/auth/profile/',
 	refresh: '/auth/token/refresh/',
+	users: '/auth/users/',
 } as const
 
 export const authApi = {
@@ -38,5 +39,10 @@ export const authApi = {
 
 	async logout(): Promise<void> {
 		tokenStorage.clear()
+	},
+
+	async getUsers(): Promise<AuthUser[]> {
+		const {data} = await httpClient.get<AuthUser[]>(AuthEndpoints.users)
+		return data
 	},
 }

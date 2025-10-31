@@ -9,6 +9,7 @@ export const useAssignRole = () => {
 		mutationFn: (payload: AssignRolePayload) => roleApi.assign(payload),
 		onSuccess: () => {
 			queryClient.invalidateQueries({queryKey: ['user']})
+			queryClient.invalidateQueries({queryKey: ['users']})
 		},
 	})
 }

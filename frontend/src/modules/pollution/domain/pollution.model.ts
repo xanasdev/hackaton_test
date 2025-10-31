@@ -22,14 +22,8 @@ export interface PollutionTypeModel {
 
 export interface MarkerPhoto {
 	id: number
-	image_path: string
+	image: string
 	uploaded_at: string
-}
-
-export interface MarkerReporter {
-	name?: string
-	avatar?: string
-	email?: string
 }
 
 export interface Marker {
@@ -37,12 +31,13 @@ export interface Marker {
 	latitude: string
 	longitude: string
 	description: string
-	region_type: string
+	region_type: string | null
 	pollution_type: PollutionTypeModel
 	status?: PollutionStatus
 	photos?: MarkerPhoto[]
-	reported_by?: MarkerReporter
 	created_at: string
+	creator?: number | null
+	creator_username?: string | null
 }
 
 export interface PollutionStats {
@@ -62,21 +57,13 @@ export interface MarkerFilters {
 	type?: PollutionType | string
 }
 
-export interface MarkerPhotoInput {
-	image_path?: string
-	image_file?: File
-}
-
 export interface CreateMarkerPayload {
 	latitude: string
 	longitude: string
 	description: string
-	region_type: string
-	pollution_type: {
-		name: PollutionType | string
-		description?: string
-	}
-	photos?: MarkerPhotoInput[]
+	region_type?: string
+	pollution_type_name: PollutionType | string
+	photos?: File[]
 }
 
 export interface UpdateMarkerPayload {
@@ -84,8 +71,6 @@ export interface UpdateMarkerPayload {
 	longitude?: string
 	description?: string
 	region_type?: string
-	pollution_type?: {
-		name: PollutionType | string
-		description?: string
-	}
+	pollution_type_name?: PollutionType | string
+	photos?: File[]
 }

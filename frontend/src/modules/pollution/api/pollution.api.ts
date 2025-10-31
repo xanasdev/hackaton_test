@@ -16,6 +16,21 @@ const PollutionEndpoints = {
 	types: '/pollution-types/',
 } as const
 
+const buildCreateFormData = (payload: CreateMarkerPayload) => {
+	const formData = new FormData()
+	formData.append('latitude', payload.latitude)
+	formData.append('longitude', payload.longitude)
+	formData.append('description', payload.description)
+	if (payload.region_type) {
+		formData.append('region_type', payload.region_type)
+	}
+	formData.append('pollution_type_name', payload.pollution_type_name)
+	payload.photos?.forEach((file) => {
+		formData.append('photos', file)
+	})
+	return formData
+}
+
 export const pollutionApi = {
 	async getAll(params?: MarkerFilters): Promise<Marker[]> {
 		const {data} = await httpClient.get<Marker[]>(PollutionEndpoints.markers, {params})
@@ -28,7 +43,10 @@ export const pollutionApi = {
 	},
 
 	async create(payload: CreateMarkerPayload): Promise<Marker> {
-		const {data} = await httpClient.post<Marker>(PollutionEndpoints.markers, payload)
+		const formData = buildCreateFormData(payload)
+		const {data} = await httpClient.post<Marker>(PollutionEndpoints.markers, formData, {
+			headers: {'Content-Type': 'multipart/form-data'},
+		})
 		return data
 	},
 

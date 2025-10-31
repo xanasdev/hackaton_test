@@ -8,14 +8,6 @@ export type ReportPayload = {
 	region?: string
 }
 
-const fileToBase64 = (file: File) =>
-	new Promise<string>((resolve, reject) => {
-		const reader = new FileReader()
-		reader.onload = () => resolve((reader.result as string) ?? '')
-		reader.onerror = () => reject(new Error('Не удалось прочитать файл'))
-		reader.readAsDataURL(file)
-	})
-
 type UsePollutionReturn = ReturnType<typeof import('./usePollution').usePollution>
 
 interface PollutionActionDeps {
@@ -37,26 +29,13 @@ export const usePollutionActions = ({createMarker, deleteMarker}: PollutionActio
 	) => {
 		if (!coordinates) return
 
-		let photosPayload: CreateMarkerPayload['photos']
-		if (data.photos?.length) {
-			try {
-				const converted = await Promise.all(
-					data.photos.map(async (file) => ({image_path: await fileToBase64(file)})),
-				)
-				photosPayload = converted
-			} catch {
-				toast.error('Не удалось обработать изображения')
-				callbacks?.onError?.()
-				return
-			}
-		}
 		const payload: CreateMarkerPayload = {
 			latitude: coordinates[0].toString(),
 			longitude: coordinates[1].toString(),
 			description: data.description,
-			region_type: data.region ?? 'Unknown',
-			pollution_type: {name: data.type, description: ''},
-			photos: photosPayload,
+			region_type: data.region,
+			pollution_type_name: data.type,
+			photos: data.photos,
 		}
 
 		createMarker(payload, {
