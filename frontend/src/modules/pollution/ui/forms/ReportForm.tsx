@@ -10,6 +10,7 @@ import {Textarea} from '@/shared/components/ui/Textarea'
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/shared/components/ui/Select'
 import {Upload} from 'lucide-react'
 import styles from '@/shared/styles/form.module.css'
+import {useTranslations} from 'next-intl'
 
 interface ReportFormProps {
 	latitude: number
@@ -26,6 +27,7 @@ export const ReportForm = ({latitude, longitude, onSubmit, isLoading}: ReportFor
 		formState: {errors},
 		setValue,
 	} = useForm<ReportPollutionFormData>({resolver: zodResolver(reportPollutionSchema)})
+const t = useTranslations('report')
 
 	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 		if (!event.target.files) return
@@ -39,52 +41,52 @@ export const ReportForm = ({latitude, longitude, onSubmit, isLoading}: ReportFor
 	return (
 		<form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-4'>
 			<div className={styles.formGroup}>
-				<Label>Location</Label>
+				<Label>{t('location')}</Label>
 				<p className={styles.mutedText}>
-					Lat: {latitude.toFixed(6)}, Lng: {longitude.toFixed(6)}
+					{t('lat')}: {latitude.toFixed(6)}, {t('lng')}: {longitude.toFixed(6)}
 				</p>
 			</div>
 
 			<div className={styles.formGroup}>
-				<Label htmlFor='type'>Pollution Type</Label>
+				<Label htmlFor='type'>{t('type')}</Label>
 				<Select onValueChange={(value) => setValue('type', value as PollutionType)}>
 					<SelectTrigger>
-						<SelectValue placeholder='Select type' />
+						<SelectValue placeholder={t('typePlaceholder')} />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value={PollutionType.TRASH}>Trash</SelectItem>
-						<SelectItem value={PollutionType.OIL_SPILL}>Oil Spill</SelectItem>
-						<SelectItem value={PollutionType.INDUSTRIAL_WASTE}>Industrial Waste</SelectItem>
-						<SelectItem value={PollutionType.SEWAGE}>Sewage</SelectItem>
-						<SelectItem value={PollutionType.PLASTIC}>Plastic</SelectItem>
-						<SelectItem value={PollutionType.OTHER}>Other</SelectItem>
+						<SelectItem value={PollutionType.TRASH}>{t('pollutionType.trash')}</SelectItem>
+						<SelectItem value={PollutionType.OIL_SPILL}>{t('pollutionType.oil_spill')}</SelectItem>
+						<SelectItem value={PollutionType.INDUSTRIAL_WASTE}>{t('pollutionType.industrial_waste')}</SelectItem>
+						<SelectItem value={PollutionType.SEWAGE}>{t('pollutionType.sewage')}</SelectItem>
+						<SelectItem value={PollutionType.PLASTIC}>{t('pollutionType.plastic')}</SelectItem>
+						<SelectItem value={PollutionType.OTHER}>{t('pollutionType.other')}</SelectItem>
 					</SelectContent>
 				</Select>
 				{errors.type && <p className={styles.errorText}>{errors.type.message}</p>}
 			</div>
 
 			<div className={styles.formGroup}>
-				<Label htmlFor='description'>Description</Label>
-				<Textarea {...register('description')} placeholder='Describe the pollution...' />
+				<Label htmlFor='description'>{t('description')}</Label>
+				<Textarea {...register('description')} placeholder={t('descriptionPlaceholder')} />
 				{errors.description && <p className={styles.errorText}>{errors.description.message}</p>}
 			</div>
 
 			<div className={styles.formGroup}>
-				<Label htmlFor='region'>Region (Optional)</Label>
-				<Input {...register('region')} placeholder='e.g., Aktau, Makhachkala' />
+				<Label htmlFor='region'>{t('region')}</Label>
+				<Input {...register('region')} placeholder={t('regionPlaceholder')} />
 			</div>
 
 			<div className={styles.formGroup}>
-				<Label htmlFor='photos'>Photos</Label>
+				<Label htmlFor='photos'>{t('photos')}</Label>
 				<div className={styles.fileInput}>
 					<Input id='photos' type='file' multiple accept='image/*' onChange={handleFileChange} />
 					<Upload className='h-4 w-4' />
 				</div>
-				{photos.length > 0 && <p className={styles.mutedText}>{photos.length} file(s) selected</p>}
+				{photos.length > 0 && <p className={styles.mutedText}>{t('photosSelected', {count: photos.length})}</p>}
 			</div>
 
 			<Button type='submit' disabled={isLoading} className='w-full'>
-				{isLoading ? 'Submitting...' : 'Report Pollution'}
+				{isLoading ? t('submitting') : t('submit')}
 			</Button>
 		</form>
 	)

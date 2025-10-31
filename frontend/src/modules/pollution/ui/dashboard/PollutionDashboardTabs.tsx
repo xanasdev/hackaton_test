@@ -4,6 +4,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/shared/components/ui/T
 import {PollutionCard} from '../PollutionCard'
 import styles from '@/shared/styles/dashboard-page.module.css'
 import {Marker, PollutionStatus} from '../../domain/pollution.model'
+import {useTranslations} from 'next-intl'
 
 interface PollutionDashboardTabsProps {
 	activeStatus: PollutionStatus
@@ -25,6 +26,8 @@ export const PollutionDashboardTabs = ({
 	statuses = DEFAULT_STATUSES,
 }: PollutionDashboardTabsProps) => {
 	const renderedMarkers = useMemo(() => markers, [markers])
+	const tStatus = useTranslations('status')
+	const tTabs = useTranslations('dashboard.tabs')
 
 	return (
 		<Tabs
@@ -35,7 +38,7 @@ export const PollutionDashboardTabs = ({
 			<TabsList>
 				{statuses.map((status) => (
 					<TabsTrigger key={status} value={status}>
-						{getStatusLabel(status)}
+						{statusLabels[status] ? tStatus(statusLabels[status]) : status}
 					</TabsTrigger>
 				))}
 			</TabsList>
@@ -43,7 +46,7 @@ export const PollutionDashboardTabs = ({
 			<TabsContent value={activeStatus} className={styles.tabContent}>
 				{renderedMarkers.length === 0 ? (
 					<Card className={styles.emptyState}>
-						<p className={styles.emptyText}>Точки не найдены</p>
+						<p className={styles.emptyText}>{tTabs('empty')}</p>
 					</Card>
 				) : (
 					<div className={styles.pointsGrid}>
@@ -57,11 +60,9 @@ export const PollutionDashboardTabs = ({
 	)
 }
 
-const STATUS_LABELS: Record<PollutionStatus, string> = {
-	[PollutionStatus.REPORTED]: 'Новые',
-	[PollutionStatus.IN_PROGRESS]: 'В работе',
-	[PollutionStatus.CLEANED]: 'Очищено',
-	[PollutionStatus.VERIFIED]: 'Проверено',
+const statusLabels: Record<PollutionStatus, string> = {
+	[PollutionStatus.REPORTED]: 'reported',
+	[PollutionStatus.IN_PROGRESS]: 'inProgress',
+	[PollutionStatus.CLEANED]: 'cleaned',
+	[PollutionStatus.VERIFIED]: 'verified',
 }
-
-const getStatusLabel = (status: PollutionStatus) => STATUS_LABELS[status] ?? status

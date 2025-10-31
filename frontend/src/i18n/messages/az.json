@@ -1,0 +1,153 @@
+{
+  "app": {
+    "title": "Xəzər Təmiz Xəritə",
+    "description": "Xəzər dənizi sahili boyunca çirklənməni izləmə platforması",
+    "tagline": "Sahil boyu ekoloji monitorinq"
+  },
+  "nav": {
+    "map": "Xəritə",
+    "dashboard": "Analitika",
+    "profile": "Profil",
+    "admin": "Admin paneli",
+    "login": "Daxil ol",
+    "register": "Qeydiyyat",
+    "logout": "Çıxış"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Şifrə",
+    "confirmPassword": "Şifrəni təsdiqlə",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "phone": "Telefon",
+    "remember": "Məni yadda saxla",
+    "forgot": "Şifrəni unutdun?",
+    "loginButton": "Daxil ol",
+    "registerButton": "Hesab yarat",
+    "noAccount": "Hesabın yoxdur?",
+    "haveAccount": "Artıq hesabın var?",
+    "logout": "Çıxış"
+  },
+  "common": {
+    "loading": "Yüklənir...",
+    "save": "Saxla",
+    "cancel": "Ləğv et",
+    "delete": "Sil",
+    "edit": "Dəyişdir",
+    "close": "Bağla",
+    "back": "Geri",
+    "apply": "Tətbiq et",
+    "clear": "Təmizlə",
+    "actions": "Əməliyyatlar",
+    "status": "Status"
+  },
+  "status": {
+    "reported": "Bildirilmiş",
+    "inProgress": "İşlənir",
+    "cleaned": "Təmizlənib",
+    "verified": "Yoxlanılıb"
+  },
+  "filter": {
+    "title": "Süzgəc",
+    "active": "Aktiv süzgəclər",
+    "status": "Statusa görə süzgəc",
+    "statusDescription": "Nöqtələri cari statusuna görə göstər",
+    "type": "Növə görə süzgəc",
+    "typeDescription": "Nöqtələri çirklənmə növünə görə göstər",
+    "search": "Ada görə axtar",
+    "reset": "Hamısını sil",
+    "allStatuses": "Bütün statuslar",
+    "allTypes": "Bütün növlər"
+  },
+  "report": {
+    "createTitle": "Çirklənmə barədə məlumat ver",
+    "editTitle": "Nöqtəni redaktə et",
+    "description": "Gördüklərinizi təsvir edin və foto əlavə edin",
+    "type": "Çirklənmə növü",
+    "typePlaceholder": "Növü seç",
+    "severity": "Dərəcə",
+    "location": "Məkan",
+    "lat": "Enlik",
+    "lng": "Uzunluq",
+    "photos": "Şəkillər",
+    "photosSelected": "Seçilmiş fayllar: {count}",
+    "region": "Region (istəyə bağlı)",
+    "regionPlaceholder": "məs., Bakı, Aktau",
+    "descriptionPlaceholder": "Çirklənməni təsvir edin...",
+    "submit": "Göndər",
+    "update": "Yenilə",
+    "delete": "Nöqtəni sil",
+    "submitting": "Göndərilir..."
+  },
+  "dashboard": {
+    "title": "Analitika",
+    "subtitle": "Statistika və irəliləyiş",
+    "stats": {
+      "total": "Ümumi hallar",
+      "reported": "Bildirilmiş",
+      "inProgress": "İşlənir",
+      "cleaned": "Təmizlənib",
+      "verified": "Yoxlanılıb"
+    },
+    "nearby": {
+      "title": "Yaxındakı nöqtələr",
+      "empty": "Yaxınlıqda nöqtə yoxdur"
+    },
+    "tabs": {
+      "empty": "Nöqtə tapılmadı"
+    },
+    "accessDenied": {
+      "title": "Giriş qadağandır",
+      "description": "Bu səhifə yalnız aktivistlər və ya adminlər üçün açıqdır."
+    },
+    "export": "Hesabatı ixrac et"
+  },
+  "account": {
+    "title": "Profil",
+    "details": "Şəxsi məlumatlar",
+    "security": "Təhlükəsizlik",
+    "notifications": "Bildirişlər",
+    "roles": "Rollar",
+    "users": "İstifadəçilər",
+    "noRoles": "Hələ rol yaradılmayıb",
+    "noUsers": "İstifadəçi tapılmadı"
+  },
+  "admin": {
+    "title": "Admin paneli",
+    "roles": {
+      "title": "Rollar",
+      "description": "Girişi idarə edin",
+      "create": "Rol yarat",
+      "name": "Rolun adı",
+      "descriptionInput": "Təsvir",
+      "permissions": "İcazələr",
+      "empty": "Hələ rol yoxdur"
+    },
+    "users": {
+      "title": "İstifadəçilər",
+      "description": "Rolları təyin edin",
+      "empty": "İstifadəçi tapılmadı"
+    }
+  },
+  "theme": {
+    "toggle": "Mövzunu dəyiş",
+    "light": "İşıqlı",
+    "dark": "Qaranlıq",
+    "system": "Sistem"
+  },
+  "map": {
+    "openReport": "Çirklənmə barədə məlumat ver",
+    "openFilters": "Süzgəcləri aç",
+    "details": "Ətraflı",
+    "assignedTo": "Məsul şəxs",
+    "createdBy": "Müəllif"
+  },
+  "pollutionType": {
+    "trash": "Zibil",
+    "oil_spill": "Neft sızması",
+    "industrial_waste": "Sənaye tullantısı",
+    "sewage": "Kanalizasiya",
+    "plastic": "Plastik",
+    "other": "Digər"
+  }
+}

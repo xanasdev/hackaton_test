@@ -1,22 +1,17 @@
-import type { Metadata } from 'next'
+import type {Metadata} from 'next'
 import './globals.css'
-import { Providers } from './providers'
+import {ReactNode} from 'react'
+import {defaultLocale} from '@/i18n/config'
 
 export const metadata: Metadata = {
-  title: 'Caspian Clean Map',
-  description: 'Interactive pollution tracking platform for the Caspian Sea coastal region',
+	title: 'Caspian Clean Map',
+	description: 'Interactive pollution tracking platform for the Caspian Sea coastal region',
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
-  return (
-    <html lang="en">
-      <body className="antialiased dark">
-        <Providers>{children}</Providers>
-      </body>
-    </html>
-  )
+export default function RootLayout({children}: {children: ReactNode}) {
+	return (
+		<html lang={defaultLocale} suppressHydrationWarning>
+			<body className='antialiased'>{children}</body>
+		</html>
+	)
 }

@@ -13,85 +13,72 @@ import {
 	Waves,
 } from 'lucide-react'
 import Link from 'next/link'
+import {useLocale, useTranslations} from 'next-intl'
 import {usePathname} from 'next/navigation'
+import {ThemeToggle} from '@/modules/theme/ThemeToggle'
+import {LanguageSwitcher} from '@/modules/layout/LanguageSwitcher'
+
+const withLocale = (locale: string, path: string) => {
+	if (!path.startsWith('/')) return path
+	return `/${locale}${path === '/' ? '' : path}`
+}
 
 export const DashboardHeader = () => {
 	const {user, logout} = useAuth()
 	const pathname = usePathname()
+	const locale = useLocale()
+	const t = useTranslations()
+	const buildLink = (path: string) => withLocale(locale, path)
+	const currentPath = pathname.replace(/^\/[a-z]{2}(?=\/|$)/i, '') || '/'
+	const linkClass = (path: string) => (currentPath === path ? styles.navLinkActive : styles.navLink)
 
 	return (
 		<header className={styles.header}>
 			<div className={styles.logo}>
 				<Waves className={styles.logoIcon} />
 				<div className={styles.logoText}>
-					<h1 className={styles.title}>Caspian Clean Map</h1>
-					<p className={styles.subtitle}>
-						Мониторинг загрязнений Каспийского моря
-					</p>
+					<h1 className={styles.title}>{t('app.title')}</h1>
+					<p className={styles.subtitle}>{t('app.tagline')}</p>
 				</div>
 			</div>
 
 			<nav className={styles.nav}>
 				{user ? (
 					<>
-						<Link
-							href='/'
-							className={
-								pathname === '/' ? styles.navLinkActive : styles.navLink
-							}
+						<Link href={buildLink('/')} className={linkClass('/')}
 						>
 							<Home className='h-4 w-4' />
-							<span>Карта</span>
+							<span>{t('nav.map')}</span>
 						</Link>
-						<Link
-							href='/dashboard'
-							className={
-								pathname === '/dashboard'
-									? styles.navLinkActive
-									: styles.navLink
-							}
-						>
+						<Link href={buildLink('/dashboard')} className={linkClass('/dashboard')}>
 							<BarChart3 className='h-4 w-4' />
-							<span>Dashboard</span>
+							<span>{t('nav.dashboard')}</span>
 						</Link>
-						<Link
-							href='/account'
-							className={
-								pathname === '/account' ? styles.navLinkActive : styles.navLink
-							}
-						>
+						<Link href={buildLink('/account')} className={linkClass('/account')}>
 							<UserCircle className='h-4 w-4' />
-							<span>Профиль</span>
+							<span>{t('nav.profile')}</span>
 						</Link>
 					</>
 				) : (
 					<>
-						<Link
-							href='/login'
-							className={
-								pathname === '/login' ? styles.navLinkActive : styles.navLink
-							}
-						>
+						<Link href={buildLink('/login')} className={linkClass('/login')}>
 							<LogIn className='h-4 w-4' />
-							<span>Войти</span>
+							<span>{t('nav.login')}</span>
 						</Link>
-						<Link
-							href='/register'
-							className={
-								pathname === '/register' ? styles.navLinkActive : styles.navLink
-							}
-						>
+						<Link href={buildLink('/register')} className={linkClass('/register')}>
 							<UserPlus className='h-4 w-4' />
-							<span>Регистрация</span>
+							<span>{t('nav.register')}</span>
 						</Link>
 					</>
 				)}
 			</nav>
 
 			<div className={styles.actions}>
+				<LanguageSwitcher />
+				<ThemeToggle />
 				{user && (
 					<>
-						<Link href='/account' className={styles.userInfo}>
+						<Link href={buildLink('/account')} className={styles.userInfo}>
 							<User className='h-4 w-4' />
 							<span className={styles.userEmail}>{user.email}</span>
 							<Badge variant='outline' className={styles.roleBadge}>
@@ -100,7 +87,7 @@ export const DashboardHeader = () => {
 						</Link>
 						<Button variant='ghost' size='sm' onClick={logout}>
 							<LogOut className='h-4 w-4' />
-							<span className={styles.logoutText}>Выйти</span>
+							<span className={styles.logoutText}>{t('nav.logout')}</span>
 						</Button>
 					</>
 				)}

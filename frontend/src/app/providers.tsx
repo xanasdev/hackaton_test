@@ -2,13 +2,17 @@
 
 import { ReactNode, useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { NextIntlClientProvider } from 'next-intl'
+import { ThemeProvider } from '@/modules/theme/ThemeProvider'
 import { Toaster } from '@/shared/components/ui/Sonner'
 
 interface ProvidersProps {
   children: ReactNode
+  locale: string
+  messages: Record<string, unknown>
 }
 
-export function Providers({ children }: ProvidersProps) {
+export function Providers({ children, locale, messages }: ProvidersProps) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -23,8 +27,12 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
-      <Toaster />
+      <NextIntlClientProvider key={locale} locale={locale} messages={messages}>
+        <ThemeProvider>
+          {children}
+          <Toaster />
+        </ThemeProvider>
+      </NextIntlClientProvider>
     </QueryClientProvider>
   )
 }

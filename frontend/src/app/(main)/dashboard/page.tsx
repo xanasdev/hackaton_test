@@ -8,6 +8,7 @@ import {Card} from '@/shared/components/ui/Card'
 import styles from '@/shared/styles/dashboard-page.module.css'
 import {PollutionStatus} from '@/modules/pollution/domain/pollution.model'
 import {usePollutionDashboard} from '@/modules/pollution/hooks/usePollutionDashboard'
+import {useTranslations} from 'next-intl'
 
 export default function DashboardPage() {
 	const {
@@ -18,6 +19,8 @@ export default function DashboardPage() {
 		handleStatusChange,
 		handleExport,
 	} = usePollutionDashboard()
+	const t = useTranslations('dashboard')
+	const tDashboard = useTranslations('dashboard.accessDenied')
 
 	if (!canManage) {
 		return (
@@ -25,11 +28,8 @@ export default function DashboardPage() {
 				<DashboardHeader />
 				<div className={styles.container}>
 					<Card className={styles.accessDenied}>
-						<h2 className={styles.accessTitle}>Доступ запрещен</h2>
-						<p className='text-muted-foreground'>
-							Для доступа к этой странице требуются права активиста или
-							администратора.
-						</p>
+						<h2 className={styles.accessTitle}>{tDashboard('title')}</h2>
+						<p className='text-muted-foreground'>{tDashboard('description')}</p>
 					</Card>
 				</div>
 			</div>
@@ -41,8 +41,8 @@ export default function DashboardPage() {
 			<DashboardHeader />
 			<div className={styles.container}>
 				<PollutionDashboardHeader
-					title='Dashboard'
-					actionLabel='Экспорт отчета'
+					title={t('title')}
+					actionLabel={t('export')}
 					onAction={handleExport}
 				/>
 
