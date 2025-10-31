@@ -49,6 +49,11 @@ export interface PollutionStats {
 	byRegion: Record<string, number>
 }
 
+export interface StatusStats {
+	in_progress: number
+	cleared: number
+}
+
 export interface MarkerFilters {
 	pollution_type?: number
 	region_type?: string

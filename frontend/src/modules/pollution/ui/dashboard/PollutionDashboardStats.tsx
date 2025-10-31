@@ -2,15 +2,19 @@
 
 import {Card} from '@/shared/components/ui/Card'
 import styles from '@/shared/styles/dashboard.module.css'
-import {PollutionStats} from '../../domain/pollution.model'
 import {useTranslations} from 'next-intl'
+import {PollutionStats} from '../../domain/pollution.model'
+import {useStatusStats} from '../../hooks/useStatusStats'
 
 interface PollutionDashboardStatsProps {
 	stats?: PollutionStats
 }
 
-export const PollutionDashboardStats = ({stats}: PollutionDashboardStatsProps) => {
+export const PollutionDashboardStats = ({
+	stats,
+}: PollutionDashboardStatsProps) => {
 	const t = useTranslations('dashboard.stats')
+	const {data: statusStats} = useStatusStats()
 	if (!stats) return null
 
 	return (
@@ -25,11 +29,15 @@ export const PollutionDashboardStats = ({stats}: PollutionDashboardStatsProps) =
 			</Card>
 			<Card className={styles.pointCard}>
 				<p className='text-sm text-muted-foreground'>{t('inProgress')}</p>
-				<p className='text-2xl font-bold text-yellow-500'>{stats.inProgress}</p>
+				<p className='text-2xl font-bold text-yellow-500'>
+					{statusStats?.in_progress ?? 0}
+				</p>
 			</Card>
 			<Card className={styles.pointCard}>
 				<p className='text-sm text-muted-foreground'>{t('cleaned')}</p>
-				<p className='text-2xl font-bold text-green-500'>{stats.cleaned}</p>
+				<p className='text-2xl font-bold text-green-500'>
+					{statusStats?.cleared ?? 0}
+				</p>
 			</Card>
 		</div>
 	)

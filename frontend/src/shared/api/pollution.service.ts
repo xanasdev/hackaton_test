@@ -1,10 +1,11 @@
-import api from '../lib/axios'
+import {StatusStats} from '@/modules/pollution/domain/pollution.model'
 import {
 	Marker,
-	PollutionTypeModel,
 	PollutionStats,
 	PollutionType,
+	PollutionTypeModel,
 } from '@/shared/types'
+import api from '../lib/axios'
 
 interface GetMarkersParams {
 	pollution_type?: number
@@ -56,7 +57,10 @@ export const pollutionService = {
 		return data
 	},
 
-	async patch(id: number, markerData: Partial<UpdateMarkerDto>): Promise<Marker> {
+	async patch(
+		id: number,
+		markerData: Partial<UpdateMarkerDto>,
+	): Promise<Marker> {
 		const {data} = await api.patch<Marker>(`/markers/${id}/`, markerData)
 		return data
 	},
@@ -78,16 +82,17 @@ export const pollutionService = {
 			inProgress: 0,
 			cleaned: 0,
 			byType: {} as Record<PollutionType, number>,
-			byRegion: markers.reduce(
-				(acc, m) => {
-					acc[m.region_type] = (acc[m.region_type] || 0) + 1
-					return acc
-				},
-				{} as Record<string, number>,
-			),
+			byRegion: markers.reduce((acc, m) => {
+				acc[m.region_type] = (acc[m.region_type] || 0) + 1
+				return acc
+			}, {} as Record<string, number>),
 		}
 	},
 
+	async getStatusStats(): Promise<StatusStats> {
+		const {data} = await api.get<StatusStats>('/markers/status-stats/')
+		return data
+	},
 
 	async exportReport(params?: GetMarkersParams): Promise<Blob> {
 		const markers = await this.getAll(params)
