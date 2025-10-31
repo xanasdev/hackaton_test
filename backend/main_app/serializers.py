@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import Marker, MarkerPhoto, PollutionType
+from .models import MarkerComment
 
 
 class PollutionTypeSerializer(serializers.ModelSerializer):
@@ -76,3 +77,18 @@ class MarkerSerializer(serializers.ModelSerializer):
                 MarkerPhoto.objects.create(marker=instance, **photo_data)
 
         return instance
+
+
+class MarkerCommentSerializer(serializers.ModelSerializer):
+    creator = serializers.PrimaryKeyRelatedField(read_only=True)
+    creator_username = serializers.CharField(source='creator.username', read_only=True)
+    marker = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = MarkerComment
+        fields = ("id", "marker", "creator", "creator_username", "message", "created_at")
+        read_only_fields = ("id", "created_at", "creator", "creator_username", "marker")
+
+    def create(self, validated_data):
+        # marker and creator will be provided by the view via save(marker=..., creator=...)
+        return MarkerComment.objects.create(**validated_data)

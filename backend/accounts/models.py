@@ -28,6 +28,8 @@ class User(AbstractUser):
         related_name='custom_user_set',
         related_query_name='custom_user',
     )
+
+    rating = models.IntegerField("Рейтинг пользователя", default=0)  # новое поле
     
     def has_permission(self, permission):
         if self.role:

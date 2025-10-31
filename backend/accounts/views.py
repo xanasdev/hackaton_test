@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, Role
-from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserSerializer, RoleSerializer, AssignRoleSerializer
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserSerializer, RoleSerializer, AssignRoleSerializer, UserRatingUpdateSerializer, UserRatingListSerializer
 from .permissions import admin_required, manager_required
 
 @extend_schema(request=UserRegistrationSerializer)
@@ -64,6 +64,39 @@ class UserListView(generics.ListAPIView):
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+@admin_required
+class UpdateUserRatingView(generics.GenericAPIView):
+    """Эндпоинт для обновления рейтинга пользователя."""
+    serializer_class = UserRatingUpdateSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        username = serializer.validated_data['username']
+        points = serializer.validated_data['points']
+        
+        try:
+            user = User.objects.get(username=username)
+            user.rating += points
+            user.save(update_fields=['rating'])
+            
+            return Response({
+                'username': user.username,
+                'new_rating': user.rating
+            })
+        except User.DoesNotExist:
+            return Response(
+                {'error': f'Пользователь {username} не найден'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+class UserRatingListView(generics.ListAPIView):
+    """Список пользователей, отсортированный по рейтингу."""
+    serializer_class = UserRatingListSerializer
+    queryset = User.objects.select_related('role').order_by('-rating')
+    permission_classes = [AllowAny]
 
 # Примеры защищенных эндпоинтов
 @api_view(['GET'])

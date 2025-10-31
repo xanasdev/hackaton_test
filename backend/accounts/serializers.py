@@ -56,3 +56,21 @@ class AssignRoleSerializer(serializers.Serializer):
 
     class Meta:
         fields = ('user_id', 'role_id')
+
+
+class UserRatingUpdateSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    points = serializers.IntegerField()
+
+    def validate_points(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Количество баллов должно быть положительным числом")
+        return value
+
+class UserRatingListSerializer(serializers.ModelSerializer):
+    role_name = serializers.CharField(source='role.name', read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'role_name', 'rating')
+
