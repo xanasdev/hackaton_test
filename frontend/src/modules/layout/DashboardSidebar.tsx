@@ -36,6 +36,7 @@ const StatCard = ({icon, value, label, className}: StatCardProps) => (
 
 export const DashboardSidebar = ({stats, markers, onFilterClick, onReportClick, onMarkerClick}: DashboardSidebarProps) => {
 	const t = useTranslations('home.sidebar')
+	const tType = useTranslations('pollutionType')
 	const locale = useLocale()
 
 	return (
@@ -83,11 +84,12 @@ export const DashboardSidebar = ({stats, markers, onFilterClick, onReportClick, 
 								<button key={marker.id} className={styles.pointCard} onClick={() => onMarkerClick(marker)}>
 									<span className={styles.emoji}>{getMarkerIcon(marker.pollution_type.name)}</span>
 									<div className={styles.pointContent}>
-										<p className={styles.pointTitle}>{marker.pollution_type.name.replace(/_/g, ' ')}</p>
+										<p className={styles.pointTitle}>{tType(marker.pollution_type.name as never)}</p>
 										<p className={styles.pointDescription}>
 											{marker.description.length > 60 ? `${marker.description.slice(0, 60)}...` : marker.description}
 										</p>
 										<p className={styles.pointDate}>
+											{t('reportedOn')}{' '}
 											{new Date(marker.created_at).toLocaleDateString(locale, {
 												day: 'numeric',
 												month: 'short',

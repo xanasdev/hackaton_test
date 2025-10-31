@@ -10,6 +10,7 @@ import {
 	getDangerLevel,
 } from '../../utils/distance'
 import {getMarkerIcon} from '../../utils/marker-style'
+import {useTranslations} from 'next-intl'
 
 interface NearbyPanelProps {
 	markers: NearbyMarker[]
@@ -24,13 +25,19 @@ export const NearbyPanel = ({
 	onMarkerClick,
 	onClose,
 }: NearbyPanelProps) => {
+	const t = useTranslations('home.nearby')
+	const tType = useTranslations('pollutionType')
+	const tRisk = useTranslations('home.nearby.risk')
+
+	const formatRiskLabel = (level: keyof typeof DANGER_LABELS) => tRisk(level)
+
 	if (markers.length === 0) {
 		return (
 			<section className={styles.panel}>
 				<header className={styles.header}>
 					<div className={styles.headerTitle}>
 						<AlertTriangle className='h-5 w-5 text-emerald-300' />
-						<span>Nearby Pollution</span>
+						<span>{t('title')}</span>
 					</div>
 					<Button
 						variant='ghost'
@@ -43,9 +50,9 @@ export const NearbyPanel = ({
 				</header>
 				<div className={styles.emptyState}>
 					<AlertTriangle className='h-10 w-10 text-emerald-400 opacity-80' />
-					<p>Рядом нет загрязнений</p>
+					<p>{t('empty')}</p>
 					<div className={styles.emptyActions}>
-						<span>Попробуйте расширить радиус поиска</span>
+						<span>{t('emptyHint')}</span>
 					</div>
 				</div>
 			</section>
@@ -57,7 +64,7 @@ export const NearbyPanel = ({
 			<header className={styles.header}>
 				<div className={styles.headerTitle}>
 					<AlertTriangle className='h-5 w-5 text-amber-300' />
-					<span>Nearby Pollution</span>
+					<span>{t('title')}</span>
 					<Badge variant='destructive'>{markers.length}</Badge>
 				</div>
 				<Button
@@ -73,8 +80,7 @@ export const NearbyPanel = ({
 			<div className={styles.location}>
 				<MapPin className='h-4 w-4' />
 				<span>
-					{userLocation.latitude.toFixed(4)},{' '}
-					{userLocation.longitude.toFixed(4)}
+					{userLocation.latitude.toFixed(4)}, {userLocation.longitude.toFixed(4)}
 				</span>
 			</div>
 
@@ -95,10 +101,10 @@ export const NearbyPanel = ({
 								<div className={styles.itemContent}>
 									<div className={styles.itemHeader}>
 										<span className={styles.itemTitle}>
-											{marker.pollution_type.name.replace(/_/g, ' ')}
+											{tType(marker.pollution_type.name as never)}
 										</span>
 										<Badge variant={DANGER_COLORS[dangerLevel]}>
-											{DANGER_LABELS[dangerLevel]}
+											{formatRiskLabel(dangerLevel)}
 										</Badge>
 									</div>
 									<p className={styles.itemDescription}>

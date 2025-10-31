@@ -168,17 +168,32 @@
       "emptyHint": "Try increasing the search radius",
       "coordinates": "Your location",
       "distance": "Distance",
+      "distanceSuffix": "{{distance}} away",
       "risk": {
         "high": "High risk",
         "medium": "Medium risk",
         "low": "Low risk"
-      }
+      },
+      "cleanArea": "Your area is clean! 🌊",
+      "close": "Close"
     },
     "details": {
       "type": "Pollution type",
       "status": "Status",
       "photos": "{count} photos",
-      "viewGallery": "Open gallery to view all"
+      "viewGallery": "Open gallery to view all",
+      "drawerTitle": "Pollution details",
+      "drawerDescription": "Information about the selected pollution point",
+      "actionsTitle": "Actions",
+      "setInProgress": "Mark as in progress",
+      "markCleaned": "Mark as cleaned",
+      "delete": "Delete point",
+      "reportedBy": "Reported by",
+      "reportedByUnknown": "Unknown",
+      "createdAt": "Reported at",
+      "region": "Region",
+      "regionUnknown": "Not specified",
+      "coordinates": "Coordinates"
     }
   }
 }
